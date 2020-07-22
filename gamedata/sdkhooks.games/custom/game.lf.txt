@@ -31,14 +31,14 @@
 			"GroundEntChanged"
 			{
 				"windows"	"177"
-				"linux"		"179"
-				"mac"		"179"
+				"linux"		"178"
+				"mac"		"178"
 			}
 			"OnTakeDamage"
 			{
 				"windows"	"73"//62
-				"linux"		"63"
-				"mac"		"63"
+				"linux"		"74"
+				"mac"		"74"
 			}
 			"PreThink"
 			{
@@ -73,74 +73,74 @@
 			"Spawn"
 			{
 				"windows"	"23" //22
-				"linux"		"23"
-				"mac"		"23"
+				"linux"		"24"
+				"mac"		"24"
 			}
 			"StartTouch"
 			{
 				"windows"	"109"//98
-				"linux"		"99"
-				"mac"		"99"
+				"linux"		"110"
+				"mac"		"110"
 			}
 			"Think"
 			{
 				"windows"	"60"//47
-				"linux"		"48"
-				"mac"		"48"
+				"linux"		"61"
+				"mac"		"61"
 			}
 			"Touch"
 			{
 				"windows"	"110"//99
-				"linux"		"100"
-				"mac"		"100"
+				"linux"		"111"
+				"mac"		"111"
 			}
 			"TraceAttack"
 			{
 				"windows"	"61"
-				"linux"		"61"
-				"mac"		"61"
+				"linux"		"62"
+				"mac"		"62"
 			}
 			"Use"
 			{
 				"windows"	"98"
-				"linux"		"98"
-				"mac"		"98"
+				"linux"		"99"
+				"mac"		"99"
 			}
 			"VPhysicsUpdate"
 			{
 				"windows"	"158"
-				"linux"		"158"
-				"mac"		"158"
+				"linux"		"159"
+				"mac"		"159"
 			}
 			"Weapon_CanSwitchTo"
 			{
 				"windows"	"266"
-				"linux"		"266"
-				"mac"		"266"
+				"linux"		"267"
+				"mac"		"267"
 			}
 			"Weapon_CanUse"
 			{
 				"windows"	"260"
-				"linux"		"260"
-				"mac"		"260"
+				"linux"		"261"
+				"mac"		"261"
 			}
 			"Weapon_Drop"
 			{
 				"windows"	"263"
-				"linux"		"263"
-				"mac"		"263"
+				"linux"		"264"
+				"mac"		"264"
 			}
 			"Weapon_Equip"
 			{
 				"windows"	"261"
-				"linux"		"261"
-				"mac"		"261"
+				"linux"		"262"
+				"mac"		"262"
 			}
 			"Weapon_Switch"
 			{
 				"windows"	"264"
-				"linux"		"264"
-				"mac"		"264"
+				"linux"		"265"
+				"mac"		"265"
 			}
 		}
 	}
