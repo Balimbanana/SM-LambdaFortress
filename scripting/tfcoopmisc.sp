@@ -27,6 +27,9 @@ public void OnPluginStart()
 	RegConsoleCmd("bot_refill",blckserver);
 	RegConsoleCmd("bot_warp_team_to_me",blckserver);
 	RegConsoleCmd("bot_whack",blckserver);
+	RegConsoleCmd("kickall", blckserver);
+	RegConsoleCmd("kick", blckserver);
+	RegConsoleCmd("kickid", blckserver);
 	HookEventEx("player_spawn",OnPlayerSpawn,EventHookMode_Post);
 	CreateTimer(1.0, resetdev, _, TIMER_REPEAT);
 }
