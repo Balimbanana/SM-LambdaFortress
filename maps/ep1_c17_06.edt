@@ -1,0 +1,15 @@
+ep1_c17_06
+{
+	entity
+	{
+		edit {targetname "lfe_ep2_changelevel" values {targetname "lfe_ep2_changeleveldisabled"} }
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "1"
+				OnMapSpawn "citfx_glowtrack3,AddOutput,OnPass endcmd:Command:changelevel ep2_outland_01:7:-1,0,-1"
+			}
+		}
+		create {classname "point_servercommand" values {targetname "endcmd"} }
+	}
+}

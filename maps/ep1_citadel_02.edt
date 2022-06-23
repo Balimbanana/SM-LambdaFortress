@@ -1,0 +1,15 @@
+ep1_citadel_02
+{
+	entity
+	{
+		edit {classname "trigger_changelevel" values {spawnflags "2" targetname "lfchangelevel"} }
+		create {classname "trigger_once" origin "0 0 0"
+			values
+			{
+				model "*33"
+				spawnflags "1"
+				OnTrigger "lfchangelevel,ChangeLevel,,1,-1"
+			}
+		}
+	}
+}

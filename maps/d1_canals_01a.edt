@@ -1,0 +1,22 @@
+d1_canals_01
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {targetname "antibrush1"}
+		delete {targetname "antirush1"}
+		delete {targetname "antitele1"}
+		delete {classname "info_ladder"}
+		delete {classname "func_ladder"}
+		delete {classname "trigger_once" origin "-5768.01 9088.06 43.73"}
+		create {classname "trigger_changelevel" origin "-5768.01 9088.06 43.73"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-5768.01 9088.06 43.73"
+				map "d1_canals_02"
+				landmark "canals_trans_0101a"
+			}
+		}
+	}
+}

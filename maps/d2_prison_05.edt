@@ -1,0 +1,16 @@
+d2_prison_05
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-4315.01 -1012.98 716.29"}
+		create {classname "trigger_changelevel" origin "-4315.01 -1012.98 716.29"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-4315.01 -1012.98 716.29"
+				map "d2_prison_06"
+			}
+		}
+	}
+}

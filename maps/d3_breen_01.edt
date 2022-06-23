@@ -1,0 +1,44 @@
+d3_breen_01
+{
+	entity
+	{
+		edit {classname "info_player_teamspawn" values {targetname "starterspawns"} }
+		create {classname "info_player_teamspawn" origin "-2340 605 613" values {targetname "spawninroom" TeamNum "2" angles "0 0 0" startdisabled "0"} }
+		create {classname "trigger_teleport" origin "-2455 -1388 -1405"
+			values
+			{
+				model "*1"
+				spawnflags "1"
+				target "tptotop"
+			}
+		}
+		create {classname "info_teleport_destination" origin "-2335 -1275 613" values {angles "0 110 0" targetname "tptotop"} }
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "ss_soldier_Deliver_4,AddOutput,OnEndSequence starterspawns:kill::0:-1,0,-1"
+				OnMapSpawn "ss_soldier_Deliver_4,AddOutput,OnEndSequence spawninroom:Enable::0:-1,0,-1"
+				OnMapSpawn "logic_EMP_plead_door_1,AddOutput,OnTrigger spawner_physgun:ForceSpawn::0:-1,0,-1"
+			}
+		}
+		
+		edit {classname "npc_eli" values {damagefilter "nulldmg"} }
+		edit {classname "npc_alyx" values {damagefilter "nulldmg"} }
+		create {classname "filter_activator_class"
+			values
+			{
+				targetname "nulldmg"
+				filterclass "null"
+				Negated "0"
+			}
+		}
+		
+		// Removes physcannon for some reason? Completely breaks everything later on
+		delete {classname "trigger_multiple" origin "-2452 -1312 623.68"}
+		edit {targetname "target_follow_camera_2" values {spawnflags "1"} }
+		edit {targetname "target_measure_player_2" values {spawnflags "1"} }
+		edit {targetname "target_measure_player" values {spawnflags "1"} }
+	}
+}

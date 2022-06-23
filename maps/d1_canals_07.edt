@@ -1,0 +1,13 @@
+d1_canals_07
+{
+	entity
+	{
+		create {classname "lfe_vehiclespawner" origin "11660 1030 -450"
+			values
+			{
+				angles "0 180 0"
+				vehicle_to_spawn "1"
+			}
+		}
+	}
+}

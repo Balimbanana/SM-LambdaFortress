@@ -1,0 +1,27 @@
+escape_00
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+		edit {classname "game_text" values {spawnflags "1"} }
+		edit {classname "env_message" values {edt_addedspawnflags "2"} }
+		edit {classname "func_areaportal" values {targetname "disabledPortal" StartOpen "1"} }
+		edit {classname "point_viewcontrol" values {edt_addedspawnflags "128"} }
+		create {classname "info_spawn_manager" values {targetname "syn_spawn_manager"} }
+		create {classname "info_player_coop" origin "-786.07 -976 -831"
+			values
+			{
+				angles "0 90 0"
+				targetname "syn_spawnpoint_00"
+			}
+		}
+		create {classname "info_player_equip"
+			values
+			{
+				targetname "syn_equipment_base"
+				weapon_portalgun "1"
+			}
+		}
+		delete {classname "weapon_portalgun" "-788 -976 -776.51"}
+	}
+}

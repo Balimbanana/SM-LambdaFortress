@@ -1,0 +1,19 @@
+d3_c17_01
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-6681.15 -823.96 -90.3"}
+		create {classname "trigger_changelevel" origin "-6681.15 -823.96 -90.3"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-6681.15 -823.96 -90.3"
+				map "d3_c17_02"
+			}
+		}
+		
+		delete {targetname "pclip_TPdoor"}
+		delete {targetname "trigger_closeTPDoor"}
+	}
+}

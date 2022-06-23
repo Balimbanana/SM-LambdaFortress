@@ -1,0 +1,17 @@
+d1_trainstation_01
+{
+	entity
+	{
+		delete {classname "trigger_once" origin "-3104 -160 0"}
+		delete {targetname "changelevel"}
+		create {classname "trigger_changelevel" origin "-3104 -160 0"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-3104 -160 0"
+				map "d1_trainstation_02"
+				landmark "trainstation_01_to_02"
+			}
+		}
+	}
+}

@@ -1,0 +1,7 @@
+ep2_outland_05
+{
+	entity
+	{
+		edit {classname "trigger_changelevel" values {edt_map "ep2_outland_06" edt_landmark "landmark_ep2_outland_05-06" map "ep2_outland_06lfe"} }
+	}
+}

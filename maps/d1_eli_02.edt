@@ -1,0 +1,36 @@
+d1_eli_02
+{
+	entity
+	{
+		delete {targetname "trigger_scrapyard_start"}
+		create {classname "trigger_once" origin "-588 646 -2624"
+			values
+			{
+				targetname "trigger_scrapyard_start"
+				StartDisabled "1"
+				model "*50"
+				spawnflags "1"
+				OnTrigger "lcs_gravgun01,Start,,2,-1"
+			}
+		}
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "trigger_attack02,AddOutput,OnTrigger telefallback:TeleportPlayers::0:-1,0,-1"
+				OnMapSpawn "trigger_attack02,AddOutput,OnTrigger lcs_gravgun01:Cancel::0:-1,0,-1"
+				OnMapSpawn "trigger_attack02,AddOutput,OnTrigger lcs_al_primary:Cancel::0:-1,0,-1"
+			}
+		}
+		create {classname "lfe_logic_playerteleport" origin "-513 990 -2650"
+			values
+			{
+				targetname "telefallback"
+				team_to_teleport "1"
+				angles "0 200 0"
+				effects "0"
+			}
+		}
+	}
+}

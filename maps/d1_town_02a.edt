@@ -1,0 +1,26 @@
+d1_town_02a
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-6583.97 -695.99 -3169.85"}
+		create {classname "trigger_changelevel" origin "-6583.97 -695.99 -3169.85"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-6583.97 -695.99 -3169.85"
+				map "d1_town_04"
+			}
+		}
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "monk,AddOutput,OnUser4 startobjects_template:kill::0:-1,0,-1"
+				OnMapSpawn "monk,FireUser4,,1,-1"
+				OnMapSpawn "startobjects_template,ForceSpawn,,2,-1"
+			}
+		}
+	}
+}

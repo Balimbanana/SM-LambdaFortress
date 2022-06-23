@@ -1,0 +1,18 @@
+d2_coast_03
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "5120 11776 2144"}
+		create {classname "trigger_changelevel" origin "5120 11776 2144"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "5120 11776 2144"
+				map "d2_coast_04"
+				//landmark "landmark_d2_coast_03-04"
+			}
+		}
+		edit {classname "lfe_vehiclespawner" origin "-6912 -13280 1120" values {angles "0 0 0"} }
+	}
+}

@@ -1,0 +1,25 @@
+d2_prison_06
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "193.49 -2544.04 -130.85"}
+		create {classname "trigger_changelevel" origin "193.49 -2544.04 -130.85"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "193.49 -2544.04 -130.85"
+				map "d2_prison_07"
+			}
+		}
+		edit {targetname "lcs_np_cell01a"
+			values
+			{
+				OnStart "logic_start_reunion,Trigger,,10,-1"
+				OnCompletion "logic_start_reunion,kill,,2,-1"
+			}
+		}
+		
+		delete {classname "trigger_multiple" origin "512 -992 36"}
+	}
+}

@@ -1,0 +1,21 @@
+ep2_outland_01
+{
+	console
+	{
+		sv_test_scripted_sequences "1"
+	}
+	entity
+	{
+		//edit {classname "trigger_changelevel" values {edt_map "ep2_outland_03" edt_landmark "landmark_ep2_outland_02-03" map "ep2_outland_03lfe"} }
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "env_zoom,AddOutput,AllPlayers 1,0,-1"
+				OnMapSpawn "relay_gman_scene_end,AddOutput,OnTrigger zoomtodefault:Zoom::0:-1,0,-1"
+			}
+		}
+		
+		create {classname "env_zoom" values {targetname "zoomtodefault" Rate "1.0" fov "90" allplayers "1"} }
+	}
+}

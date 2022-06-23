@@ -1,0 +1,39 @@
+d3_c17_10b
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "2761.23 1136.04 891.74"}
+		create {classname "trigger_changelevel" origin "2761.23 1136.04 891.74"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "2761.23 1136.04 891.74"
+				map "d3_c17_11"
+			}
+		}
+		edit {classname "weapon_physcannon" values {targetname "groundcannon"} }
+		
+		delete {targetname "lobby_combinedoor_portalbrush"}
+		delete {classname "trigger_once" origin "3192 -376 320"}
+		create {classname "trigger_once" origin "3192 -376 320"
+			values
+			{
+				model "*33"
+				StartDisabled "0"
+				spawnflags "1"
+				OnTrigger "mortar_fire_expl,Explode,,11,-1"
+				OnTrigger "mortar_fire_wav2,PlaySound,,9.5,-1"
+				OnTrigger "mortar_fire_shake,StartShake,,8,-1"
+				OnTrigger "mortar_fire_wav,PlaySound,,8,-1"
+				OnTrigger "spookyroom_soldier_makers,Enable,,0,-1"
+				OnTrigger "turrets_squadstay_assault_trigger,Kill,,0,-1"
+				OnTrigger "turrets_barneystay_assault,Deactivate,,0.1,-1"
+				OnTrigger "turrets_squadstay_assault,Deactivate,,0.1,-1"
+			}
+		}
+		
+		// Closes exit door
+		delete {classname "trigger_once" origin "2768 1136 832"}
+	}
+}

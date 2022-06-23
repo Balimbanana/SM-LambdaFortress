@@ -1,0 +1,12 @@
+hls02amrl
+{
+	entity
+	{
+		modifycase
+		{
+			model "models/barney.mdl" model "models/barney_hd.mdl"
+			//classname "npc_barney" classname "monster_barney"
+			//classname "multi_manager" classname "logic_relay"
+		}
+	}
+}

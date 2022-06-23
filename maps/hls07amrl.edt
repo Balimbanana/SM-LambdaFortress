@@ -1,0 +1,23 @@
+hls07amrl
+{
+	entity
+	{
+		modifycase
+		{
+			model "models/barney.mdl" model "models/barney_hd.mdl"
+			//classname "npc_barney" classname "monster_barney"
+			//classname "multi_manager" classname "logic_relay"
+		}
+		delete {targetname "player_spawn_items"}
+		delete {targetname "player_spawn_template"}
+		edit {classname "trigger_changelevel"
+			values
+			{
+				edt_map "hls06amrl"
+				edt_landmark "hls06amrltohls07amrl"
+				spawnflags "6"
+				startdisabled "1"
+			}
+		}
+	}
+}

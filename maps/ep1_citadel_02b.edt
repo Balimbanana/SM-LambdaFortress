@@ -1,0 +1,30 @@
+ep1_citadel_02
+{
+	entity
+	{
+		delete {targetname "entry_transition_door"}
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "trigger_tracktrain_teleportenable,AddOutput,OnTrigger spawnpoint_00:kill::0:-1,0,-1"
+				OnMapSpawn "trigger_tracktrain_teleportenable,AddOutput,OnTrigger spawnpoint_01:Enable::0:-1,0,-1"
+				OnMapSpawn "trigger_tracktrain_teleportenable,AddOutput,OnTrigger spawnpoint_01:AddOutput:spawnflags 1:0:-1,0,-1"
+			}
+		}
+		edit {targetname "redteleport01" values {parentname "citadel_train_lift01_1"} }
+		
+		delete {classname "info_player_start"}
+		edit {classname "info_player_teamspawn" values {targetname "spawnpoint_00"} }
+		create {classname "info_player_teamspawn" origin "3251 4625 2565"
+			values
+			{
+				targetname "spawnpoint_01"
+				parentname "citadel_train_lift01_1"
+				angles "0 0 0"
+			}
+		}
+		
+		delete {targetname "impact_trigger"}
+	}
+}

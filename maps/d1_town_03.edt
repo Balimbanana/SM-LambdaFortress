@@ -1,0 +1,16 @@
+d1_town_03
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-3760 -34.03 -3379.71"}
+		create {classname "trigger_changelevel" origin "-3760 -34.03 -3379.71"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-3760 -34.03 -3379.71"
+				map "d1_town_02_p2"
+			}
+		}
+	}
+}

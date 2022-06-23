@@ -1,0 +1,95 @@
+ep1_c17_05
+{
+	entity
+	{
+		modifycase {"CompareValue" "*" "max" "*"}
+		modifycase {"InitialValue" "*" "startvalue" "*"}
+		modifycase {"OnEqualTo" "*" "OnUser2" "*"}
+		modifycase {"OnGreaterThan" "*" "OnUser3" "*"}
+		//modifycase {"denycommandconcept" "TLK_DENY_COMMAND" "denycommandconcept" ""}
+		// SetValue to SetValueNoFire
+		edit {classname "logic_compare" values {classname "math_counter"} }
+		edit {classname "npc_citizen"
+			values
+			{
+				denycommandconcept ""
+			}
+		}
+		create {classname "scripted_sequence" origin "10384 10186 -769"
+			values
+			{
+				targetname "rallypoint_citizens_waittarget3"
+				m_iszEntity "citizen_refugees_3"
+				m_fMoveTo "2"
+				spawnflags "608"
+				angles "0 90 0"
+			}
+		}
+		create {classname "scripted_sequence" origin "10452.9 10152.4 -770"
+			values
+			{
+				targetname "rallypoint_citizens_waittarget2"
+				m_iszEntity "citizen_refugees_2"
+				m_fMoveTo "2"
+				spawnflags "608"
+				angles "0 90 0"
+			}
+		}
+		create {classname "scripted_sequence" origin "10462.9 10243 -770"
+			values
+			{
+				targetname "rallypoint_citizens_waittarget1"
+				m_iszEntity "citizen_refugees_1"
+				m_fMoveTo "2"
+				spawnflags "608"
+				angles "0 90 0"
+			}
+		}
+		create {classname "scripted_sequence" origin "10492.3 10275 -770"
+			values
+			{
+				targetname "rallypoint_citizens_waittarget4"
+				m_iszEntity "citizen_refugees_4"
+				m_fMoveTo "2"
+				spawnflags "608"
+				angles "0 90 0"
+			}
+		}
+		create {classname "logic_auto"
+			values
+			{
+				OnMapSpawn "template_citizens_spawn_1,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget1:MoveToPosition::0:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_2,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget2:MoveToPosition::0:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_3,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget3:MoveToPosition::0:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_4,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget4:MoveToPosition::0:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_1,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget1:CancelSequence::4:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_2,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget2:CancelSequence::4:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_3,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget3:CancelSequence::4:-1,0,-1"
+				OnMapSpawn "template_citizens_spawn_4,AddOutput,OnEntitySpawned rallypoint_citizens_waittarget4:CancelSequence::4:-1,0,-1"
+				OnMapSpawn "lcs_al_c17_05_barneyoverhere,AddOutput,OnCompletion fixstartcit:Enable::0:-1,0,-1"
+				OnMapSpawn "lcs_al_c17_05_barneyoverhere,AddOutput,OnCompletion fixstartcitclient:Enable::2:-1,0,-1"
+			}
+		}
+		create {classname "trigger_once" origin "10464 10336 -772.36"
+			values
+			{
+				targetname "fixstartcit"
+				startdisabled "0"
+				model "*52"
+				spawnflags "2"
+				filtername "filter_citizens"
+				OnTrigger "fixstartcitclient,kill,,0,-1"
+			}
+		}
+		create {classname "trigger_once" origin "10464 10336 -772.36"
+			values
+			{
+				targetname "fixstartcitclient"
+				startdisabled "1"
+				model "*52"
+				spawnflags "1"
+				OnTrigger "compare_citizen_spawn,FireUser2,,0,-1"
+			}
+		}
+	}
+}

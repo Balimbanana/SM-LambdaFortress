@@ -1,0 +1,40 @@
+escape_02
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+		delete {classname "point_clientcommand"}
+		delete {classname "point_servercommand"}
+		edit {classname "game_text" values {spawnflags "1"} }
+		edit {classname "env_message" values {edt_addedspawnflags "2"} }
+		edit {classname "func_areaportal" values {targetname "disabledPortal" StartOpen "1"} }
+		edit {classname "point_viewcontrol" values {edt_addedspawnflags "128"} }
+		create {classname "info_spawn_manager" values {targetname "syn_spawn_manager"} }
+		create {classname "info_player_coop" origin "6115 2065 -1490"
+			values
+			{
+				angles "0 -110 0"
+				targetname "syn_spawnpoint_00"
+			}
+		}
+		create {classname "info_player_equip"
+			values
+			{
+				targetname "syn_equipment_base"
+				weapon_portalgun "1"
+			}
+		}
+		create {classname "game_end" values {targetname "endgame"} }
+		create {classname "point_servercommand" values {targetname "syn_ps"} }
+		create {classname "logic_auto"
+			values
+			{
+				OnMapSpawn "credits,AddOutput,OnCreditsDone syn_ps:Command:crashmap_changerestoremap d1_trainstation_01:0:-1,0,-1"
+				OnMapSpawn "credits,AddOutput,OnCreditsDone endgame:EndGame::1:-1,0,-1"
+				OnMapSpawn "relay_blackout,AddOutput,OnTrigger syn_ps:Command:crashmap_changerestoremap d1_trainstation_01:184:-1,0,-1"
+				OnMapSpawn "relay_blackout,AddOutput,OnTrigger endgame:EndGame::185:-1,0,-1"
+			}
+		}
+		edit {targetname "furniture_ride1" values {model "models/blackoutportal.mdl"} }
+	}
+}

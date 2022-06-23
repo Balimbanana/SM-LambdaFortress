@@ -1,0 +1,36 @@
+d2_coast_09
+{
+	console
+	{
+		sk_gunship_health_increments "8"
+	}
+	entity
+	{
+		delete {classname "logic_auto" origin "-14182.2 12524.1 544"}
+		delete {classname "player_loadsaved"}
+		delete {classname "trigger_once" origin "9984 1036 -80"}
+		delete {targetname "changelevel"}
+		create {classname "trigger_changelevel" origin "9984 1036 -80"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "9984 1036 -80"
+				map "d2_coast_10"
+				//landmark "landmark_d2_coast_09-10"
+			}
+		}
+
+		edit {targetname "battery" values {spawnflags "128"} }
+		edit {targetname "battery1" values {spawnflags "128"} }
+		edit {targetname "battery2" values {spawnflags "128"} }
+		edit {targetname "battery3" values {spawnflags "128"} }
+		edit {targetname "battery4" values {spawnflags "128"} }
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "gate_door,AddOutput,OnOpen battery_relay_*:Kill::0:-1,0,-1"
+			}
+		}
+	}
+}

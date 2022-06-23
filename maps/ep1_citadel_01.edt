@@ -1,0 +1,38 @@
+ep1_citadel_01
+{
+	entity
+	{
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger logic_weapon_strip_physcannon_start:Trigger::0:-1,0,-1"
+				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger lcs_al_citadel_01_gravcharge_02:Start::0:-1,0,-1"
+				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger supergrav:TurnOn::0:-1,0,-1"
+			}
+		}
+		
+		// Issues from logic_weapon_strip_dissolve to weapon_dissolve1 not being able to target physcannon
+		create {classname "env_global"
+			values
+			{
+				targetname "supergrav"
+				initialstate "0"
+				globalstate "super_phys_gun"
+			}
+		}
+		
+		
+		// Does not properly drop physcannon anyways might implement fix in to framework
+		//create {classname "trigger_weapon_strip" origin "-2658 1377 2576.86"
+		//	values
+		//	{
+		//		targetname "weapon_strip1"
+		//		spawnflags "1"
+		//		model "*113"
+		//		KillWeapons "0"
+		//		startdisabled "1"
+		//	}
+		//}
+	}
+}

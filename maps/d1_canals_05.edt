@@ -1,0 +1,7 @@
+d1_canals_05
+{
+	entity
+	{
+		edit {targetname "airboatspawner1" values {origin "7254 1402 -465.02"} }
+	}
+}

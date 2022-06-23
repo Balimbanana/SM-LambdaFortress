@@ -1,0 +1,7 @@
+d1_canals_12
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+	}
+}

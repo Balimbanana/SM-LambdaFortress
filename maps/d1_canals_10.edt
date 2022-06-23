@@ -1,0 +1,14 @@
+d1_canals_10
+{
+	entity
+	{
+		delete {targetname "global_newgame_entmaker"}
+		delete {targetname "global_newgame_template"}
+		delete {targetname "global_newgame_spawner_suit"}
+		delete {targetname "global_newgame_spawner_crowbar"}
+		delete {targetname "global_newgame_spawner_pistol"}
+		delete {targetname "global_newgame_spawner_smg"}
+		delete {targetname "global_newgame_spawner_airboat"}
+		delete {targetname "global_newgame_spawner_357"}
+	}
+}

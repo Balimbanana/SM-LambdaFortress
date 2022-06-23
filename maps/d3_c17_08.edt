@@ -1,0 +1,16 @@
+d3_c17_08
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "2551.99 -423.98 596.65"}
+		create {classname "trigger_changelevel" origin "2551.99 -423.98 596.65"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "2551.99 -423.98 596.65"
+				map "d3_c17_09"
+			}
+		}
+	}
+}

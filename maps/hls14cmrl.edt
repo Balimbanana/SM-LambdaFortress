@@ -1,0 +1,29 @@
+hls14cmrl
+{
+	entity
+	{
+		modifycase
+		{
+			model "models/barney.mdl" model "models/barney_hd.mdl"
+			//classname "npc_barney" classname "monster_barney"
+		}
+		delete {targetname "player_spawn_items"}
+		delete {targetname "player_spawn_template"}
+		create {classname "info_player_equip"
+			values
+			{
+				item_suit "1"
+				item_longjump "1"
+			}
+		}
+		edit {classname "trigger_changelevel"
+			values
+			{
+				edt_map "hls14bmrl"
+				edt_landmark "hls14bmrltohls14cmrl"
+				spawnflags "6"
+				startdisabled "1"
+			}
+		}
+	}
+}

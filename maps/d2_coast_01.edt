@@ -1,0 +1,17 @@
+d2_coast_01
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-11840 2484 1666"}
+		create {classname "trigger_changelevel" origin "-11840 2484 1666"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-11840 2484 1666"
+				map "d2_coast_03"
+				//landmark "landmark_d2_coast_01-03"
+			}
+		}
+	}
+}

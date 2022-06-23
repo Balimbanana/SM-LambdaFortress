@@ -1,0 +1,63 @@
+ep2_outland_01
+{
+	entity
+	{
+		//edit {classname "trigger_changelevel" values {edt_map "ep2_outland_01a" edt_landmark "landmark_ep2_outland_01-01a" map "ep2_outland_02"} }
+		delete {targetname "clip_player_train"}
+		delete {targetname "clip_player"}
+		edit {classname "trigger_once" origin "-47.55 51.97 367.05"
+			values
+			{
+				targetname "lftrig1"
+			}
+		}
+		edit {classname "trigger_once" origin "82.36 -1210.4 39.38"
+			values
+			{
+				targetname "lftrig2"
+			}
+		}
+		edit {classname "trigger_multiple" origin "-6289 3811.17 -278"
+			values
+			{
+				targetname "lftrig3"
+			}
+		}
+		edit {targetname "redteleport02" values {angles "0 -140 0"} }
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "lftrig1,AddOutput,OnTrigger lftele_01:TeleportPlayers::0:-1,0,-1"
+				OnMapSpawn "lftrig1,AddOutput,OnTrigger lfspawn1:kill::0:-1,0,-1"
+				OnMapSpawn "lftrig1,AddOutput,OnTrigger lfspawn2:Enable::0:-1,0,-1"
+				OnMapSpawn "lftrig1,AddOutput,OnTrigger spawnmanager:SetCheckPoint:lfspawn2:0:-1,0,-1"
+				OnMapSpawn "lftrig2,AddOutput,OnTrigger lfspawn2:kill::0:-1,0,-1"
+				OnMapSpawn "lftrig2,AddOutput,OnTrigger lfspawn3:Enable::0:-1,0,-1"
+				OnMapSpawn "lftrig2,AddOutput,OnTrigger spawnmanager:SetCheckPoint:lfspawn3:0:-1,0,-1"
+				OnMapSpawn "Hudhint_ladder_enable_relay,AddOutput,OnTrigger lfspawn3:kill::0:-1,0,-1"
+				OnMapSpawn "Hudhint_ladder_enable_relay,AddOutput,OnTrigger lfspawn4:Enable::0:-1,0,-1"
+				OnMapSpawn "Hudhint_ladder_enable_relay,AddOutput,OnTrigger spawnmanager:SetCheckPoint:lfspawn4:0:-1,0,-1"
+				OnMapSpawn "lftrig3,AddOutput,OnTrigger lfspawn4:kill::0:1,0,-1"
+				OnMapSpawn "lftrig3,AddOutput,OnTrigger lfspawn5:Enable::0:1,0,-1"
+				OnMapSpawn "lftrig3,AddOutput,OnTrigger spawnmanager:SetCheckPoint:lfspawn5:0:1,0,-1"
+			}
+		}
+		
+		create {classname "lfe_logic_playerteleport" origin "-55 53 360"
+			values
+			{
+				targetname "lftele_01"
+				team_to_teleport "1"
+				angles "50 0 0"
+			}
+		}
+		edit {classname "info_player_teamspawn" values {targetname "lfspawn1"} }
+		create {classname "info_player_teamspawn" origin "-55 53 360" values {targetname "lfspawn2" startdisabled "1" angles "50 0 0" TeamNum "2" SpawnMode "0" MatchSummary "0"} }
+		create {classname "info_player_teamspawn" origin "352 -786 50" values {targetname "lfspawn3" startdisabled "1" angles "0 -140 0" TeamNum "2" SpawnMode "0" MatchSummary "0"} }
+		create {classname "info_player_teamspawn" origin "-5205 3645 -145" values {targetname "lfspawn4" startdisabled "1" angles "0 110 0" TeamNum "2" SpawnMode "0" MatchSummary "0"} }
+		create {classname "info_player_teamspawn" origin "-6270 3685 -1370" values {targetname "lfspawn5" startdisabled "1" angles "0 -90 0" TeamNum "2" SpawnMode "0" MatchSummary "0"} }
+		delete {classname "info_player_start"}
+	}
+}

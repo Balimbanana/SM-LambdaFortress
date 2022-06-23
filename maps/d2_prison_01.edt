@@ -1,0 +1,9 @@
+d2_prison_01
+{
+	entity
+	{
+		delete {targetname "antirush1"}
+		delete {targetname "antibrush1"}
+		delete {targetname "antitele1"}
+	}
+}

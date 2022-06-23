@@ -1,0 +1,7 @@
+d1_trainstation_06
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+	}
+}

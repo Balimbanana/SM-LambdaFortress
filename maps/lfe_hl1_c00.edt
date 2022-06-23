@@ -1,0 +1,33 @@
+lfe_hl1_c00
+{
+	entity
+	{
+		edit {classname "monster_generic" values {classname "generic_actor"} }
+		edit {classname "trigger_changelevel" values {map "hls01amrl"} }
+		delete {targetname "spawncheck"}
+		create {classname "trigger_once" origin "2726 3188.5 596"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "2726 3188.5 596"
+				spawnflags "1"
+				OnTrigger "syn_hudtimer,Start,15,0,-1"
+			}
+		}
+		create {classname "hud_timer"
+			values
+			{
+				targetname "syn_hudtimer"
+				TimerText "STARTING IN..."
+				TimerType "1"
+				OnTimer "c0a0_auto,Trigger,,0,-1"
+			}
+		}
+		create {classname "logic_auto"
+			values
+			{
+				OnMapSpawn "train,Stop,,0,-1"
+			}
+		}
+	}
+}

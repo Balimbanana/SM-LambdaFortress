@@ -1,0 +1,120 @@
+ep1_citadel_00
+{
+	entity
+	{
+		// Dropdown gunship wait
+		//delete {classname "trigger_once" origin "-7920 5444 84"}
+		//delete {classname "trigger_once" origin "-7812 5404 -48"}
+		
+		//create {classname "trigger_multiple" origin "-7916 5432 -128"
+		//	values
+		//	{
+		//		model "*10"
+		//		angles "0 90 0"
+		//		spawnflags "1"
+		//		OnTrigger "ss_dog_gunship_down,BeginSequence,,3,1"
+		//		OnTrigger "pclip_gunship_2,Enable,,0,1"
+		//		OnTrigger "SS_alyx_pathedge_hopdown,BeginSequence,,5,1"
+		//		OnStartTouch "!activator,SetDamageFilter,,0,-1"
+		//	}
+		//}
+		
+		// Might be causing crash on map change?
+		//edit {classname "env_sprite" origin "11099 -5318.6 -9630" values {GlowProxySize "128"} }
+		//edit {classname "point_viewcontrol" values {spawnflags "156"} }
+		
+		//delete {targetname "lrelay_trains_debris"}
+		//create {classname "logic_relay"
+		//	values
+		//	{
+		//		targetname "lrelay_trains_debris"
+		//		OnTrigger "ptemplate_trash_02,ForceSpawn,,0,-1"
+		//		OnTrigger "ltimer_splode,Enable,,1,-1"
+		//		OnTrigger "ptemplate_trash_03,ForceSpawn,,2,-1"
+		//		OnTrigger "zoom_to_fov_20_30,Zoom,,4,-1"
+		//		OnTrigger "ptemplate_trash_04,ForceSpawn,,5,-1"
+		//	}
+		//}
+		edit {targetname "blackout" values {model "models/blackoutep1.mdl"} }
+		
+		delete { targetname "trigger_falldeath" }
+		delete { classname "trigger_multiple" origin "-8592 5690 -83.33" }
+		delete { targetname "relay_cancelVCDs" }
+		
+		//fix render bug
+		edit {targetname "sprite_end_final_explosion_1" values {origin "11146 -5312 -9317.9"} }
+		// Fix broken ep1 Alyx model in LFE
+		edit {targetname "alyx_01" values {model "models/alyx.mdl"} }
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "maker_vort_summon*,AddOutput,OnEntitySpawned npc_vortigaunt:TurnBlue:1:0:-1,0,-1"
+				OnMapSpawn "lrelay_trains_debris,AddOutput,OnSpawn camera_tv_breen:SetOn::0:-1,0,-1"
+				OnMapSpawn "ss_vort_defense_1,AddOutput,OnBeginSequence npc_vortigaunt:TurnBlue:1:0:-1,0,-1"
+				OnMapSpawn "ss_vort_reload_1,AddOutput,OnBeginSequence npc_vortigaunt:TurnBlue:1:0:-1,0,-1"
+				OnMapSpawn "alt_SS_vort_summon,AddOutput,OnBeginSequence npc_vortigaunt:TurnBlue:1:0:-1,0,-1"
+				OnMapSpawn "path_VanRide_31,AddOutput,OnPass lfe_teleport03:TeleportPlayers::4:1,0,-1"
+				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:Unlock::0:-1,0,-1"
+				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:ExitVehicle::2:-1,0,-1"
+				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:Lock::2.5:-1,0,-1"
+			}
+		}
+		
+		create {classname "logic_relay"
+			values
+			{
+				targetname "relay_gman_start"
+				OnTrigger "npc_vortigaunt,TurnBlue,1,7.5,-1"
+				OnTrigger "vort_gordon_grab,AddOutput,renderfx 6,0,-1"
+				OnTrigger "vort_gordon_grab2,AddOutput,renderfx 6,0,-1"
+				OnTrigger "vort_gordon_grab,AddOutput,renderfx 0,22,-1"
+				OnTrigger "vort_gordon_grab2,AddOutput,renderfx 0,22,-1"
+			}
+		}
+		
+		// Force enter Van
+		create {classname "trigger_multiple" origin "-6600 5728 512"
+			values
+			{
+				targetname "entervan"
+				startdisabled "1"
+				model "*98"
+				spawnflags "64"
+				OnTrigger "Van,EnterVehicle,,0,-1"
+			}
+		}
+		
+		delete {targetname "relay_ping_van_hudhint"}
+		create {classname "logic_relay"
+			values
+			{
+				targetname "relay_InVanNag"
+				OnTrigger "entervan,Enable,,5,-1"
+			}
+		}
+		
+		// Remake because LFE devs broke the order on these outputs
+		delete {targetname "lcs_ep1_intro_07"}
+		create {classname "logic_choreographed_scene" origin "-9097.53 5935.63 -63.898"
+			values
+			{
+				targetname "lcs_ep1_intro_07"
+				SceneFile "scenes/episode_1/intro/ep1_intro_07.vcd"
+				onplayerdeath "1"
+				busyactor "3"
+				"OnTrigger1" "lcs_ep1_intro_07,Pause,,0,-1"
+				"OnTrigger3" "relay_train_go_van,Trigger,,0,-1"
+				"OnTrigger4" "relay_Vancrash_citadel_1,Trigger,,0,-1"
+				"OnTrigger1" "SS_Van_Citadel_Alyx,BeginSequence,,0,-1"
+				"OnTrigger1" "SS_Van_Citadel_Van,BeginSequence,,0,-1"
+				"OnTrigger1" "SS_Van_Citadel_dog,BeginSequence,,0,-1"
+				"OnStart" "alyx,StartScripting,,0,-1"
+				"OnCompletion" "alyx,StopScripting,,0,-1"
+				"OnTrigger3" "maker_Vanjunk,ForceSpawn,,3.2,-1"
+				"OnCompletion" "lcs_ep1_intro_08,Start,,0,-1"
+			}
+		}
+	}
+}

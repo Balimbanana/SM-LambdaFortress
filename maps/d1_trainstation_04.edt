@@ -1,0 +1,7 @@
+d1_trainstation_04
+{
+	entity
+	{
+		delete {classname "func_forcefield" origin "-3332 -3668 502"}
+	}
+}

@@ -1,0 +1,17 @@
+d1_canals_03
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-3464 -80 -1000.46"}
+		create {classname "trigger_changelevel" origin "-3464 -80 -1000.46"
+			values
+			{
+				map "d1_canals_05"
+				landmark "trans_canals_03_05"
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "-3464 -80 -1000.46"
+			}
+		}
+	}
+}

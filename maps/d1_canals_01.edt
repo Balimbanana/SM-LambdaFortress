@@ -1,0 +1,16 @@
+d1_canals_01
+{
+	entity
+	{
+		delete {classname "lfe_logic_playerteleport"}
+		delete {targetname "antirush1"}
+		delete {targetname "antibrush1"}
+		delete {targetname "antirush2"}
+		delete {targetname "antibrush2"}
+		delete {classname "trigger_once" origin "768 3008 97.77"}
+		//edit {targetname "changelevel" values {origin "0 0 -300" landmark "canals_trans_0101a"} }
+		delete {targetname "changelevel"}
+		create {classname "trigger_changelevel" origin "699 2993 -100" values {edt_mins "-10 -10 -10" edt_maxs "1000 3001 400" map "d1_canals_01a" landmark "canals_trans_0101a"} }
+		create {classname "info_spawn_manager" values {targetname "syn_spawn_manager"} }
+	}
+}

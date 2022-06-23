@@ -1,0 +1,8 @@
+ep1_c17_02a
+{
+	entity
+	{
+		edit {classname "npc_alyx" values {damagefilter "nulldmg"} }
+		create {classname "filter_activator_class" values {targetname "nulldmg" filterclass "null" filtername "nulldmg"} }
+	}
+}

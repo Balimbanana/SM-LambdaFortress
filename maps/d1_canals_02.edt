@@ -1,0 +1,22 @@
+d1_canals_02
+{
+	entity
+	{
+		delete {classname "func_brush" origin "2896 -2332 -560"}
+		create {classname "prop_physics" origin "2920 -2350 -736" values {spawnflags "8" solid "6" model "models/props_c17/oildrum001.mdl"} }
+		delete {classname "func_brush" origin "-672 1392 -768"}
+		delete {targetname "antibrush"}
+		delete {targetname "antirush"}
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "-536.27 1529.51 -761"}
+		create {classname "trigger_changelevel" origin "-672 1392 -768"
+			values
+			{
+				map "d1_canals_03"
+				landmark "canals_trans_0203"
+				edt_mins "-49 -49 -65"
+				edt_maxs "49 49 65"
+			}
+		}
+	}
+}

@@ -1,0 +1,17 @@
+d2_prison_07
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "4574.38 -4335.98 -619.71"}
+		create {classname "trigger_changelevel" origin "4574.38 -4335.98 -619.71"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "4574.38 -4335.98 -619.71"
+				map "d2_prison_08"
+			}
+		}
+		edit {targetname "door_croom2_gate" values {spawnflags "1280"} }
+	}
+}

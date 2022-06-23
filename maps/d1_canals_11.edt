@@ -1,0 +1,31 @@
+d1_canals_03
+{
+	entity
+	{
+		//delete {targetname "changelevel"}
+		//delete {classname "trigger_once" origin "-11520 -1040.51 -830"}
+		//create {classname "trigger_changelevel" origin "-11520 -1040.51 -830"
+		//	values
+		//	{
+		//		edt_getbspmodelfor_classname "trigger_once"
+		//		edt_getbspmodelfor_origin "-11520 -1040.51 -830"
+		//		map "d1_canals_12"
+		//		landmark "landmark_canals_11_12"
+		//	}
+		//}
+		create {classname "logic_auto"
+			values
+			{
+				OnMapSpawn "relay_guncave_startgunmount,AddOutput,OnTrigger prop_vehicle_airboat:EnableGun:1:0:-1,0,-1"
+			}
+		}
+		edit {classname "lfe_vehiclespawner" origin "9984 9282.22 -896" values {angles "0 -90 0"} }
+		edit {classname "lfe_vehiclespawner" origin "9952 7008 -864" values {angles "0 90 0"} }
+		edit {classname "lfe_vehiclespawner" origin "9982.03 8457.48 -922" values {angles "0 -90 0"} }
+		edit {classname "lfe_vehiclespawner" origin "5344 4800 -947" values {angles "0 90 0"} }
+		edit {classname "lfe_vehiclespawner" origin "5664 4880 -820" values {angles "0 90 0"} }
+		delete {classname "lfe_vehiclespawner" origin "9970.57 7152 -864"}
+		delete {classname "lfe_vehiclespawner" origin "9984 9282.22 -896"}
+		delete {classname "lfe_vehiclespawner" origin "9972 8052 -620"}
+	}
+}

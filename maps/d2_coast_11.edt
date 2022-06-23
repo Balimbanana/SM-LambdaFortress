@@ -1,0 +1,7 @@
+d2_coast_11
+{
+	entity
+	{
+		edit {classname "npc_antlionguard" values {OnDeath "pt_enclave,ForceSpawn,,0,-1"} }
+	}
+}

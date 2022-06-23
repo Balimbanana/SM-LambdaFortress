@@ -1,0 +1,17 @@
+d3_c17_07
+{
+	entity
+	{
+		edit {classname "weapon_physcannon" values {targetname "alwaysspawn"} }
+		delete {targetname "changelevel"}
+		delete {classname "trigger_once" origin "10160 2939.98 -403.71"}
+		create {classname "trigger_changelevel" origin "10160 2939.98 -403.71"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "10160 2939.98 -403.71"
+				map "d3_c17_08"
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+d3_c17_10a
+{
+	entity
+	{
+		delete {targetname "changelevel"}
+		delete {targetname "player_spawn_items"}
+		edit {targetname "player_spawn_items_maker" values {"Template06" "barneydiff"} }
+		delete {classname "trigger_once" origin "505.99 4888.02 382.15"}
+		create {classname "trigger_changelevel" origin "505.99 4888.02 382.15"
+			values
+			{
+				edt_getbspmodelfor_classname "trigger_once"
+				edt_getbspmodelfor_origin "505.99 4888.02 382.15"
+				map "d3_c17_10b"
+			}
+		}
+	}
+}
