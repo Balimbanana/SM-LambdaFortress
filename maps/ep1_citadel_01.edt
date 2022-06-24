@@ -9,6 +9,9 @@ ep1_citadel_01
 				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger logic_weapon_strip_physcannon_start:Trigger::0:-1,0,-1"
 				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger lcs_al_citadel_01_gravcharge_02:Start::0:-1,0,-1"
 				OnMapSpawn "logic_weapon_strip_dissolve,AddOutput,OnTrigger supergrav:TurnOn::0:-1,0,-1"
+				OnMapSpawn "alyx,AddOutput,OnUser4 template_alyx:kill::0:-1,1,-1"
+				OnMapSpawn "alyx,FireUser4,,1.1,-1"
+				OnMapSpawn "template_alyx,Spawn,,1.2,-1"
 			}
 		}
 		
