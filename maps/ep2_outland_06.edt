@@ -1,0 +1,47 @@
+ep2_outland_06
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+		delete {classname "player_loadsaved"}
+		create {classname "filter_activator_class" values {targetname "nulldmg" filterclass "nullcls" Negated "0"} }
+		edit {targetname "alyx_sniper" values {damagefilter "nulldmg"} }
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "pointTemplate_alyx_sniper,AddOutput,OnEntitySpawned setupname:Trigger::0:-1,0,-1"
+				OnMapSpawn "goopit3_cleanup_relay,kill,,0,-1"
+				OnMapSpawn "changelevel_to_06a,Enable,,0,-1"
+				OnMapSpawn "trigger_shutExitGate,kill,,0,-1"
+			}
+		}
+		create {classname "logic_relay"
+			values
+			{
+				targetname "setupname"
+				OnTrigger "alyx_sniper,AddOutput,classname npc_alyx,0,-1"
+			}
+		}
+		delete {classname "trigger_multiple" origin "2048 2560 197.08"}
+		create {classname "trigger_multiple" origin "2048 2560 197.08"
+			values
+			{
+				//edt_getbspmodelfor_targetname "fall_trigger"
+				model "*143"
+				wait "1"
+				filtername "jeep_filter"
+				spawnflags "8"
+				OnStartTouch "jalopyteleport,Teleport,,0,-1"
+			}
+		}
+		create {classname "point_teleport" origin "3505 2270 740"
+			values
+			{
+				targetname "jalopyteleport"
+				target "jeep"
+				angles "0 90 0"
+			}
+		}
+	}
+}

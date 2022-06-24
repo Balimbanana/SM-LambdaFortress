@@ -1,0 +1,7 @@
+ep2_outland_06a
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+	}
+}

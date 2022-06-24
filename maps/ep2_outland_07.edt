@@ -1,0 +1,31 @@
+ep2_outland_07
+{
+	entity
+	{
+		delete {classname "info_player_start"}
+		create {classname "trigger_multiple" origin "-9695 -9680 185"
+			values
+			{
+				targetname "enterchoreo"
+				model "*190"
+				startdisabled "1"
+				spawnflags "64"
+				OnTrigger "cvehicle_barn1,AllPlayersEnterVehicle,,0,-1"
+			}
+		}
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent04 enterchoreo:kill::0:-1,0,-1"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent04 env_zoom:UnZoom::1:-1,0,-1"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent04 cvehicle_barn1:Unlock::1:-1,0,-1"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent02 enterchoreo:Enable::0:-1,0,-1"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent02 cvehicle_barn1:AllPlayersEnterVehicle::3:-1,0,-1"
+				OnMapSpawn "ss_advisor_start,AddOutput,OnScriptEvent02 cvehicle_barn1:Lock::0:-1,0,-1"
+				OnMapSpawn "relay_start_player_vehicle,AddOutput,OnTrigger relayenterchoreo:Trigger::0:-1,0,-1"
+			}
+		}
+		edit {targetname "furniture_barn1" values {model "models/blackoutep2.mdl"} }
+	}
+}
