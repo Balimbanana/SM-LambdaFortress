@@ -60,6 +60,7 @@ ep1_citadel_00
 				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:Unlock::0:-1,0,-1"
 				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:ExitVehicle::2:-1,0,-1"
 				OnMapSpawn "path_VanRide_31,AddOutput,OnPass Van:Lock::2.5:-1,0,-1"
+				OnMapSpawn "path_VanRide_31,AddOutput,OnPass counter_vanride_end01_resume:Add:65:2.5:-1,0,-1"
 			}
 		}
 		
@@ -119,5 +120,7 @@ ep1_citadel_00
 				"OnCompletion" "lcs_ep1_intro_08,Start,,0,-1"
 			}
 		}
+		
+		edit {targetname "counter_vanride_end01_resume" values {max "65"} }
 	}
 }
