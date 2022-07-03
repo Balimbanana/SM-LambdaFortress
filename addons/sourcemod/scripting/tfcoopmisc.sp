@@ -1,9 +1,28 @@
 #include <sdktools>
 #include <sdkhooks>
+#undef REQUIRE_PLUGIN
+#undef REQUIRE_EXTENSIONS
+#tryinclude <SteamWorks>
+#tryinclude <updater>
+#define REQUIRE_PLUGIN
+#define REQUIRE_EXTENSIONS
+
+#define PLUGIN_VERSION "1.00"
+#define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
+
 #pragma semicolon 1;
 #pragma newdecls required;
 
 float LastCmdRestrict[128];
+
+public Plugin myinfo =
+{
+	name = "LFCoopMiscFixes",
+	author = "Balimbanana",
+	description = "Fixes issues in LFE.",
+	version = PLUGIN_VERSION,
+	url = "https://github.com/Balimbanana/SM-LambdaFortress"
+}
 
 public void OnPluginStart()
 {
@@ -48,7 +67,37 @@ public void OnPluginStart()
 				SDKHookEx(i, SDKHook_OnTakeDamage, OnTakeDamage);
 			}
 		}
+		int iEntity = -1;
+		while ((iEntity = FindEntityByClassname(iEntity, "npc_metropolice")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(iEntity))
+			{
+				SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnCombineNPCTakeDamage);
+			}
+		}
+		iEntity = -1;
+		while ((iEntity = FindEntityByClassname(iEntity, "npc_combine_s")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(iEntity))
+			{
+				SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnCombineNPCTakeDamage);
+			}
+		}
 	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name,"updater",false))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public void Updater_OnPluginUpdated()
+{
+	// Reload this plugin on update
+	ReloadPlugin(INVALID_HANDLE);
 }
 
 public Action blckserver(int client, int args)
@@ -177,6 +226,35 @@ public Action OnTakeDamage(int victim, int& attacker, int& inflictor, float& dam
 					damage = 0.0;
 					return Plugin_Changed;
 				}
+			}
+		}
+	}
+	return Plugin_Continue;
+}
+
+public void OnEntityCreated(int iEntity, const char[] szClassname)
+{
+	if ((StrEqual(szClassname, "npc_metropolice", false)) || (StrEqual(szClassname, "npc_combine_s", false)))
+	{
+		SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnCombineNPCTakeDamage);
+	}
+	
+	return;
+}
+
+public Action OnCombineNPCTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype)
+{
+	if ((IsValidEntity(attacker)) && (IsValidEntity(inflictor)))
+	{
+		// Fixes running over combine, normally you just stop dead in your tracks because of scaled HP in LFE
+		char szClassname[32];
+		GetEntityClassname(inflictor, szClassname, sizeof(szClassname));
+		if ((damagetype == 17) && ((StrEqual(szClassname, "prop_vehicle_airboat", false)) || (StrEqual(szClassname, "prop_vehicle_jeep", false))))
+		{
+			if ((damage > 50.0) && (damage < 200.0))
+			{
+				damage = 200.0;
+				return Plugin_Changed;
 			}
 		}
 	}

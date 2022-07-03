@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"  	"1.00"
+			"Previous"	"0.99"
+		}
+		
+		"Notes"	"Add updater and take damage fixes."
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/tfcoopmisc.smx"
+		"Source"	"Path_SM/scripting/tfcoopmisc.sp"
+	}
+}
