@@ -1,4 +1,4 @@
-hls14bmrl
+hls03amrl
 {
 	entity
 	{
@@ -25,5 +25,6 @@ hls14bmrl
 				startdisabled "1"
 			}
 		}
+		edit {classname "hl1_xen_plantlight" values {classname "xen_plantlight"} }
 	}
 }

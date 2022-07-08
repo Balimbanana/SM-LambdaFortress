@@ -1,5 +1,9 @@
 hls14amrl
 {
+	console
+	{
+		sk_bigmomma_health_factor "12"
+	}
 	entity
 	{
 		modifycase
@@ -23,6 +27,26 @@ hls14amrl
 				edt_landmark "hls13amrltohls14amrl"
 				spawnflags "6"
 				startdisabled "1"
+			}
+		}
+		edit {classname "hl1_xen_plantlight" values {classname "xen_plantlight"} }
+		
+		create {classname "logic_auto"
+			values
+			{
+				spawnflags "0"
+				OnMapSpawn "monster_bigmomma,AddOutput,OnDeath web1:Trigger::0:-1,0,-1"
+				OnMapSpawn "monster_bigmomma,AddOutput,OnDeath web1.1:Trigger::0:-1,0,-1"
+				OnMapSpawn "monster_bigmomma,AddOutput,OnDeath gonarchdead:Trigger::1:-1,0,-1"
+				OnMapSpawn "falltodeath2_mm,AddOutput,OnTrigger gonarchdead:kill::0:-1,0,-1"
+			}
+		}
+		delete {targetname "collaps_stone"}
+		create {classname "logic_relay"
+			values
+			{
+				targetname "gonarchdead"
+				OnTrigger "falltodeath2_mm,Trigger,,0,-1"
 			}
 		}
 	}
