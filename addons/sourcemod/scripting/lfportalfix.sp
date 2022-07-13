@@ -1,17 +1,33 @@
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
+#undef REQUIRE_PLUGIN
+#undef REQUIRE_EXTENSIONS
+#tryinclude <SteamWorks>
+#tryinclude <updater>
+#define REQUIRE_PLUGIN
+#define REQUIRE_EXTENSIONS
 
 #pragma semicolon 1;
 #pragma newdecls required;
 #pragma dynamic 2097152;
 
-#define PLUGIN_VERSION "0.1"
+#define PLUGIN_VERSION "0.2"
+#define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfportalfixupdater.txt"
 
 int WeapList = -1;
 char szMap[64];
 bool bMapStarted = false;
+bool bLoadedAfterMap = false;
 bool HasPickedUpPortal2 = false;
+float flSoundChecksSkip = 0.0;
+
+float LastVel[128][3];
+float LastApplyVel[128];
+float EntryAng[128];
+float flShootPlyDelay[128];
+Handle dpClient[128];
+int LastPortal[128];
 
 public Plugin myinfo = 
 {
@@ -26,40 +42,93 @@ public void OnPluginStart()
 {
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEventEx("entity_killed", Event_EntityKilled, EventHookMode_Post);
+	HookEventEx("teamplay_round_start", OnRoundReset, EventHookMode_Post);
+	HookEventEx("arena_round_start", OnRoundReset, EventHookMode_Post);
+	
 	RegConsoleCmd("dropweapon", DropPortalGun);
 	
-	// In tfcoopmisc
-	/*
-	RegConsoleCmd("kickall", block);
-	RegConsoleCmd("kick", block);
-	RegConsoleCmd("kickid", block);
-	RegConsoleCmd("bot_kick", block);
-	RegConsoleCmd("bot_warp_team_to_me", block);
-	RegConsoleCmd("bot_teleport", block);
-	RegConsoleCmd("bot_command", block);
-	*/
-	RegConsoleCmd("taunt_by_name", blocktaunt);
+	RegServerCmd("changelevel", ChangeLevelTriggers);
+	
+	if (bLoadedAfterMap)
+	{
+		int ent = -1;
+		while((ent = FindEntityByClassname(ent, "prop_physics")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(ent))
+			{
+				SetupPortalBox(ent);
+			}
+		}
+		
+		ent = -1;
+		while((ent = FindEntityByClassname(ent, "tf_weapon_portalgun")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(ent))
+			{
+				SDKHookEx(ent, SDKHook_StartTouch, StartTouchPortalGun);
+				HookSingleEntityOutput(ent, "OnPlayerUse", TouchPortalGunOutput);
+				HookSingleEntityOutput(ent, "OnPlayerPickup", TouchPortalGunOutput);
+			}
+		}
+		
+		bLoadedAfterMap = false;
+	}
+	
+	AddNormalSoundHook(SoundFixesNormal);
 }
 
-public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
+public Action ChangeLevelTriggers(int args)
 {
-	ClientCommand(client, "alias bot \"echo \"\"");
-	ClientCommand(client, "alias bot_add \"echo \"\"");
-	ClientCommand(client, "alias bot_add_tf \"echo \"\"");
-	ClientCommand(client, "alias bot_kick \"echo \"\"");
-	ClientCommand(client, "alias sv_shutdown \"echo nope\"");
-	return true;
+	flSoundChecksSkip = GetTickedTime()+1.0;
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name,"updater",false))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public void OnClientDisconnect(int client)
+{
+	LastApplyVel[client] = 0.0;
+	LastVel[client] = NULL_VECTOR;
+	LastPortal[client] = -1;
+}
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	if ((late) && (GetMapHistorySize() != -1))
+	{
+		bLoadedAfterMap = true;
+	}
 }
 
 public void OnMapStart()
 {
-	HookEntityOutput("prop_portal", "OnPlacedSuccessfully", PortalPlaced);
-	GetCurrentMap(szMap, sizeof(szMap));
-	if ((StrContains(szMap, "escape_", false) == 0) || (StrContains(szMap, "testchmb_a_", false) == 0))
+	if (GetMapHistorySize() != -1)
 	{
-		CreateTimer(1.0, TimerCheckPortalPos, _, TIMER_FLAG_NO_MAPCHANGE);
+		HookEntityOutput("prop_portal", "OnPlacedSuccessfully", PortalPlaced);
+		GetCurrentMap(szMap, sizeof(szMap));
+		if ((StrContains(szMap, "escape_", false) == 0) || (StrContains(szMap, "testchmb_a_", false) == 0))
+		{
+			CreateTimer(1.0, TimerCheckPortalPos, _, TIMER_FLAG_NO_MAPCHANGE);
+		}
+		bMapStarted = true;
+		
+		if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-1.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-1.wav", true);
+		if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-2.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-2.wav", true);
+		if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-3.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-3.wav", true);
+		if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-4.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-4.wav", true);
+		if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-5.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-5.wav", true);
+		if (FileExists("sound/player/futureshoes1.wav", true, NULL_STRING)) PrecacheSound("sound/player/futureshoes1.wav", true);
+		if (FileExists("sound/player/futureshoes2.wav", true, NULL_STRING)) PrecacheSound("sound/player/futureshoes2.wav", true);
 	}
-	bMapStarted = true;
+}
+
+public Action OnRoundReset(Handle event, const char[] name, bool dontBroadcast)
+{
 	int ent = -1;
 	while((ent = FindEntityByClassname(ent, "prop_physics")) != INVALID_ENT_REFERENCE)
 	{
@@ -68,11 +137,19 @@ public void OnMapStart()
 			SetupPortalBox(ent);
 		}
 	}
-	if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-1.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-1.wav", true);
-	if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-2.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-2.wav", true);
-	if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-3.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-3.wav", true);
-	if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-4.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-4.wav", true);
-	if (FileExists("sound/vo/aperture_ai/generic_security_camera_destroyed-5.wav", true, NULL_STRING)) PrecacheSound("vo/aperture_ai/generic_security_camera_destroyed-5.wav", true);
+	
+	ent = -1;
+	while((ent = FindEntityByClassname(ent, "tf_weapon_portalgun")) != INVALID_ENT_REFERENCE)
+	{
+		if (IsValidEntity(ent))
+		{
+			SDKHookEx(ent, SDKHook_StartTouch, StartTouchPortalGun);
+			HookSingleEntityOutput(ent, "OnPlayerUse", TouchPortalGunOutput);
+			HookSingleEntityOutput(ent, "OnPlayerPickup", TouchPortalGunOutput);
+		}
+	}
+	
+	return Plugin_Continue;
 }
 
 public Action block(int client, int args)
@@ -80,20 +157,98 @@ public Action block(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action blocktaunt(int client, int args)
-{
-	if (args > 0)
-	{
-		static char szArg[32];
-		GetCmdArg(1, szArg, sizeof(szArg));
-		if (StringToInt(szArg) < 1) return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
 public Action OnLevelInit(const char[] mapName, char mapEntities[2097152])
 {
 	bMapStarted = false;
+}
+
+public void OnGameFrame()
+{
+	static float vecShootVelocity[3], vecCurPortalAngles[3], vecPortalOrigin[3], vecEndAdjustedVelocity[3];
+	static float VelocityOffset[2];
+	if (GetClientCount(false) > 0)
+	{
+		for (int i = 1; i < MaxClients+1; i++)
+		{
+			if (IsValidEntity(i))
+			{
+				if (IsClientConnected(i))
+				{
+					if (IsPlayerAlive(i))
+					{
+						if ((HasEntProp(i, Prop_Data, "m_hPortalEnvironment")) && (LastApplyVel[i] < GetGameTime()))
+						{
+							int hPortalEnvironment = GetEntPropEnt(i,Prop_Data,"m_hPortalEnvironment");
+							if (hPortalEnvironment != -1)
+							{
+								if ((hPortalEnvironment != LastPortal[i]) && (LastPortal[i] != -1))
+								{
+									LastPortal[i] = -1;
+									GetEntPropVector(hPortalEnvironment, Prop_Data, "m_vecAbsOrigin", vecPortalOrigin);
+									GetEntPropVector(hPortalEnvironment, Prop_Data, "m_angRotation", vecCurPortalAngles);
+									
+									NegateVector(LastVel[i]);
+									VelocityOffset[0] = LastVel[i][0]+LastVel[i][1];
+									VelocityOffset[1] = LastVel[i][2];
+									
+									if (((EntryAng[i] > 10.0) || (EntryAng[i] < -10.0)) && (((vecCurPortalAngles[0] < 10.0) && (vecCurPortalAngles[0] > -10.0)) || ((vecCurPortalAngles[0] < -44.0) && (vecCurPortalAngles[0] > -90.0))))
+									{
+										//AngledApply
+										VelocityOffset[0] = LastVel[i][2];
+										VelocityOffset[1] = (LastVel[i][0]+LastVel[i][1])*1.5+(LastVel[i][2]);
+									}
+									
+									vecEndAdjustedVelocity[0] = (vecPortalOrigin[0] + (VelocityOffset[0] * Cosine(DegToRad(vecCurPortalAngles[1]))));
+									vecEndAdjustedVelocity[1] = (vecPortalOrigin[1] + (VelocityOffset[0] * Sine(DegToRad(vecCurPortalAngles[1]))));
+									vecEndAdjustedVelocity[2] = (vecPortalOrigin[2] - (VelocityOffset[1] * Sine(DegToRad(vecCurPortalAngles[0]))));
+									
+									MakeVectorFromPoints(vecPortalOrigin, vecEndAdjustedVelocity, vecShootVelocity);
+									ScaleVector(vecShootVelocity, 0.75);
+									
+									if (dpClient[i] != INVALID_HANDLE) CloseHandle(dpClient[i]);
+									
+									Handle dp = CreateDataPack();
+									WritePackFloat(dp, vecShootVelocity[0]);
+									WritePackFloat(dp, vecShootVelocity[1]);
+									WritePackFloat(dp, vecShootVelocity[2]);
+									flShootPlyDelay[i] = GetGameTime()+0.09;
+									dpClient[i] = dp;
+									
+									LastApplyVel[i] = GetGameTime()+0.1;
+								}
+								else
+								{
+									LastPortal[i] = hPortalEnvironment;
+									GetEntPropVector(i, Prop_Data, "m_vecAbsVelocity", LastVel[i]);
+									GetEntPropVector(hPortalEnvironment, Prop_Data, "m_angRotation", vecCurPortalAngles);
+									EntryAng[i] = vecCurPortalAngles[0];
+								}
+							}
+							else LastPortal[i] = -1;
+						}
+						else if (flShootPlyDelay[i] != 0.0)
+						{
+							if (flShootPlyDelay[i] <= GetGameTime())
+							{
+								if (dpClient[i] != INVALID_HANDLE)
+								{
+									ResetPack(dpClient[i]);
+									vecShootVelocity[0] = ReadPackFloat(dpClient[i]);
+									vecShootVelocity[1] = ReadPackFloat(dpClient[i]);
+									vecShootVelocity[2] = ReadPackFloat(dpClient[i]);
+									CloseHandle(dpClient[i]);
+									dpClient[i] = INVALID_HANDLE;
+									
+									flShootPlyDelay[i] = 0.0;
+									TeleportEntity(i, NULL_VECTOR, NULL_VECTOR, vecShootVelocity);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 public Action TimerCheckPortalPos(Handle timer)
@@ -135,6 +290,8 @@ public Action TimerCheckPortalPos(Handle timer)
 		}
 	}
 	CreateTimer(0.5, TimerCheckPortalPos, _, TIMER_FLAG_NO_MAPCHANGE);
+	
+	return Plugin_Handled;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -452,4 +609,34 @@ void CheckTouchPortalgun(int entity, int client)
 			}
 		}
 	}
+}
+
+public Action SoundFixesNormal(int clients[64], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags)
+{
+	if (flSoundChecksSkip >= GetTickedTime()) return Plugin_Continue;
+	
+	// Change fall damage sound to Portal land sound if using Portal gun.
+	static char szClassname[32];
+	if (StrContains(sample, "pl_fallpain", false) != -1)
+	{
+		if ((entity > 0) && (entity <= MaxClients))
+		{
+			if (HasEntProp(entity, Prop_Data, "m_hActiveWeapon"))
+			{
+				int hActiveWeapon = GetEntPropEnt(entity, Prop_Data, "m_hActiveWeapon");
+				if (IsValidEntity(hActiveWeapon))
+				{
+					GetEntityClassname(hActiveWeapon, szClassname, sizeof(szClassname));
+					if (StrContains(szClassname, "weapon_portalgun", false) != -1)
+					{
+						Format(sample, sizeof(sample), "sound/player/futureshoes%i.wav", GetRandomInt(1,2));
+						
+						return Plugin_Changed;
+					}
+				}
+			}
+		}
+	}
+	
+	return Plugin_Continue;
 }

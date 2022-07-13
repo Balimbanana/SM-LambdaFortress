@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.00"
-			"Previous"	"0.99"
+			"Latest"  	"1.01"
+			"Previous"	"1.00"
 		}
 		
-		"Notes"	"Add updater and take damage fixes."
+		"Notes"	"Cleanup a couple things."
 	}
 	
 	"Files"

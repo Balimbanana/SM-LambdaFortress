@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.00"
+#define PLUGIN_VERSION "1.01"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -26,34 +26,38 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-	RegConsoleCmd("bot",blckserver);
-	RegConsoleCmd("bot_forcefireweapon",blckserver);
-	RegConsoleCmd("bot_forceattack2",blckserver);
-	RegConsoleCmd("bot_forceattackon",blckserver);
-	RegConsoleCmd("bot_flipout",blckserver);
-	RegConsoleCmd("bot_defend",blckserver);
-	RegConsoleCmd("bot_changeclass",blckserver);
-	RegConsoleCmd("bot_selectweaponslot",blckserver);
-	RegConsoleCmd("bot_dontmove",blckserver);
-	RegConsoleCmd("bot_randomnames",blckserver);
-	RegConsoleCmd("bot_saveme",blckserver);
-	RegConsoleCmd("bot_jump",blckserver);
-	RegConsoleCmd("bot_mimic",blckserver);
-	RegConsoleCmd("bot_command",blckserver);
-	RegConsoleCmd("bot_mimic_yaw_offset",blckserver);
-	RegConsoleCmd("bot_kill",blckserver);
-	RegConsoleCmd("bot_kick",blckserver);
-	RegConsoleCmd("bot_changeteams",blckserver);
-	RegConsoleCmd("bot_teleport",blckserver);
-	RegConsoleCmd("bot_refill",blckserver);
-	RegConsoleCmd("bot_warp_team_to_me",blckserver);
-	RegConsoleCmd("bot_whack",blckserver);
+	RegConsoleCmd("bot", blckserver);
+	RegConsoleCmd("bot_add", blckserver);
+	RegConsoleCmd("bot_add_tf", blckserver);
+	RegConsoleCmd("bot_forcefireweapon", blckserver);
+	RegConsoleCmd("bot_forceattack2", blckserver);
+	RegConsoleCmd("bot_forceattackon", blckserver);
+	RegConsoleCmd("bot_flipout", blckserver);
+	RegConsoleCmd("bot_defend", blckserver);
+	RegConsoleCmd("bot_changeclass", blckserver);
+	RegConsoleCmd("bot_selectweaponslot", blckserver);
+	RegConsoleCmd("bot_dontmove", blckserver);
+	RegConsoleCmd("bot_randomnames", blckserver);
+	RegConsoleCmd("bot_saveme", blckserver);
+	RegConsoleCmd("bot_jump", blckserver);
+	RegConsoleCmd("bot_mimic", blckserver);
+	RegConsoleCmd("bot_command", blckserver);
+	RegConsoleCmd("bot_mimic_yaw_offset", blckserver);
+	RegConsoleCmd("bot_kill", blckserver);
+	RegConsoleCmd("bot_kick", blckserver);
+	RegConsoleCmd("bot_changeteams", blckserver);
+	RegConsoleCmd("bot_teleport", blckserver);
+	RegConsoleCmd("bot_refill", blckserver);
+	RegConsoleCmd("bot_warp_team_to_me", blckserver);
+	RegConsoleCmd("bot_whack", blckserver);
 	RegConsoleCmd("kickall", blckserver);
 	RegConsoleCmd("kick", blckserver);
 	RegConsoleCmd("kickid", blckserver);
 	
 	// Prevent spam of create/remove vehicle
 	RegConsoleCmd("lfe_createvehicle", LFECreateVehicle);
+	// Prevent certain taunts
+	RegConsoleCmd("taunt_by_name", blocktaunt);
 	
 	HookEventEx("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	CreateTimer(1.0, resetdev, _, TIMER_REPEAT);
@@ -98,6 +102,17 @@ public void Updater_OnPluginUpdated()
 {
 	// Reload this plugin on update
 	ReloadPlugin(INVALID_HANDLE);
+}
+
+public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
+{
+	ClientCommand(client, "alias bot \"echo \"\"");
+	ClientCommand(client, "alias bot_add \"echo \"\"");
+	ClientCommand(client, "alias bot_add_tf \"echo \"\"");
+	ClientCommand(client, "alias bot_kick \"echo \"\"");
+	ClientCommand(client, "alias sv_shutdown \"echo nope\"");
+	
+	return true;
 }
 
 public Action blckserver(int client, int args)
@@ -320,5 +335,16 @@ public Action LFECreateVehicle(int client, int args)
 		return Plugin_Handled;
 	}
 	LastCmdRestrict[client] = GetTickedTime()+3.0;
+	return Plugin_Continue;
+}
+
+public Action blocktaunt(int client, int args)
+{
+	if (args > 0)
+	{
+		static char szArg[32];
+		GetCmdArg(1, szArg, sizeof(szArg));
+		if (StringToInt(szArg) < 1) return Plugin_Handled;
+	}
 	return Plugin_Continue;
 }

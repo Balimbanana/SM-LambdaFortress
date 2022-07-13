@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"  	"0.2"
+			"Previous"	"0.1"
+		}
+		
+		"Notes"	"Add gameframe fixes to portal exit velocity."
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/lfportalfix.smx"
+		"Source"	"Path_SM/scripting/lfportalfix.sp"
+	}
+}
