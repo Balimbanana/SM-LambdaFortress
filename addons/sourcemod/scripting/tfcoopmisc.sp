@@ -7,12 +7,13 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.01"
+#define PLUGIN_VERSION "1.02"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
 #pragma newdecls required;
 
+ConVar sv_vote_issue_kick_allowed, sv_vote_issue_ban_allowed;
 float LastCmdRestrict[128];
 
 public Plugin myinfo =
@@ -58,9 +59,15 @@ public void OnPluginStart()
 	RegConsoleCmd("lfe_createvehicle", LFECreateVehicle);
 	// Prevent certain taunts
 	RegConsoleCmd("taunt_by_name", blocktaunt);
+	// Fix CVars to actually apply correctly
+	RegConsoleCmd("callvote", Command_CallVoteBlock);
 	
 	HookEventEx("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	CreateTimer(1.0, resetdev, _, TIMER_REPEAT);
+	
+	sv_vote_issue_kick_allowed = FindConVar("sv_vote_issue_kick_allowed");
+	sv_vote_issue_ban_allowed = FindConVar("sv_vote_issue_ban_allowed");
+	if (sv_vote_issue_ban_allowed == INVALID_HANDLE) sv_vote_issue_ban_allowed = CreateConVar("sv_vote_issue_ban_allowed", "0", "Enable voting to ban other players.", _, true, 0.0, true, 1.0);
 	
 	if (GetMapHistorySize() > -1)
 	{
@@ -119,6 +126,37 @@ public Action blckserver(int client, int args)
 {
 	if (client == 0) return Plugin_Continue;
 	return Plugin_Handled;
+}
+
+// Fix CVar sv_vote_issue_kick_allowed to actually block the vote if disabled
+public Action Command_CallVoteBlock(int client, int args)
+{
+	if (args > 0)
+	{
+		static char szArg[32];
+		GetCmdArg(1, szArg, sizeof(szArg));
+		if (StrEqual(szArg, "kick", false))
+		{
+			if (sv_vote_issue_kick_allowed != INVALID_HANDLE)
+			{
+				if (!sv_vote_issue_kick_allowed.IntValue)
+				{
+					return Plugin_Handled;
+				}
+			}
+		}
+		else if (StrEqual(szArg, "ban", false))
+		{
+			if (sv_vote_issue_ban_allowed != INVALID_HANDLE)
+			{
+				if (!sv_vote_issue_ban_allowed.IntValue)
+				{
+					return Plugin_Handled;
+				}
+			}
+		}
+	}
+	return Plugin_Continue;
 }
 
 public void OnClientPutInServer(int client)
