@@ -7,13 +7,14 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.02"
+#define PLUGIN_VERSION "1.03"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
 #pragma newdecls required;
 
 ConVar sv_vote_issue_kick_allowed, sv_vote_issue_ban_allowed;
+ConVar sv_cheats;
 float LastCmdRestrict[128];
 
 public Plugin myinfo =
@@ -63,11 +64,16 @@ public void OnPluginStart()
 	RegConsoleCmd("callvote", Command_CallVoteBlock);
 	
 	HookEventEx("player_spawn", OnPlayerSpawn, EventHookMode_Post);
-	CreateTimer(1.0, resetdev, _, TIMER_REPEAT);
+	if (!HookEventEx("player_connect_client", EventHookPlayerConnect, EventHookMode_Pre))
+	{
+		HookEventEx("player_connect", EventHookPlayerConnect, EventHookMode_Pre);
+	}
+	CreateTimer(0.1, resetdev, _, TIMER_REPEAT);
 	
 	sv_vote_issue_kick_allowed = FindConVar("sv_vote_issue_kick_allowed");
 	sv_vote_issue_ban_allowed = FindConVar("sv_vote_issue_ban_allowed");
 	if (sv_vote_issue_ban_allowed == INVALID_HANDLE) sv_vote_issue_ban_allowed = CreateConVar("sv_vote_issue_ban_allowed", "0", "Enable voting to ban other players.", _, true, 0.0, true, 1.0);
+	sv_cheats = FindConVar("sv_cheats");
 	
 	if (GetMapHistorySize() > -1)
 	{
@@ -118,8 +124,20 @@ public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
 	ClientCommand(client, "alias bot_add_tf \"echo \"\"");
 	ClientCommand(client, "alias bot_kick \"echo \"\"");
 	ClientCommand(client, "alias sv_shutdown \"echo nope\"");
+	QueryClientConVar(client, "sv_cheats", clcheat, 0);
 	
 	return true;
+}
+
+public void clcheat(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (sv_cheats.IntValue == 0)
+	{
+		if (StringToInt(cvarValue) > 0)
+		{
+			SendConVarValue(client, sv_cheats, "0");
+		}
+	}
 }
 
 public Action blckserver(int client, int args)
@@ -161,7 +179,22 @@ public Action Command_CallVoteBlock(int client, int args)
 
 public void OnClientPutInServer(int client)
 {
-	CreateTimer(5.0, ApplyHooks, client, TIMER_FLAG_NO_MAPCHANGE);
+	bool bKicked = false;
+	if (IsClientConnected(client))
+	{
+		if (IsClientInGame(client))
+		{
+			if (IsFakeClient(client))
+			{
+				if (!sv_cheats.BoolValue)
+				{
+					KickClient(client, "");
+					bKicked = true;
+				}
+			}
+		}
+	}
+	if (!bKicked) CreateTimer(5.0, ApplyHooks, client, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action ApplyHooks(Handle timer, int client)
@@ -314,6 +347,21 @@ public Action OnCombineNPCTakeDamage(int victim, int& attacker, int& inflictor, 
 	return Plugin_Continue;
 }
 
+public Action EventHookPlayerConnect(Handle event, const char[] name, bool dontBroadcast)
+{
+	char szNetworkID[64];
+	GetEventString(event, "networkid", szNetworkID, sizeof(szNetworkID));
+	if (StrEqual(szNetworkID, "BOT", false))
+	{
+		if (sv_cheats.IntValue == 0)
+		{
+			return Plugin_Handled;
+		}
+	}
+	
+	return Plugin_Continue;
+}
+
 public void OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -330,6 +378,7 @@ public Action resetdev(Handle timer)
 		{
 			if (IsClientInGame(i))
 			{
+				QueryClientConVar(i, "sv_cheats", clcheat, 0);
 				if (HasEntProp(i, Prop_Send, "m_bIsPlayerADev"))
 				{
 					if (GetEntProp(i, Prop_Send, "m_bIsPlayerADev"))

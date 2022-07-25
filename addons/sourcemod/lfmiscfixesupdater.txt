@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.02"
-			"Previous"	"1.01"
+			"Latest"  	"1.03"
+			"Previous"	"1.02"
 		}
 		
-		"Notes"	"Actually prevent certain votes when disabled by CVar."
+		"Notes"	"Prevent client-side sv_cheats for some situations. Kick new bots if sv_cheats is 0."
 	}
 	
 	"Files"
