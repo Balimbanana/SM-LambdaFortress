@@ -141,8 +141,8 @@
 			"AcceptInput"
 			{
 				"windows"	"37"
-				"linux"		"37"
-				"mac"		"37"
+				"linux"		"38"
+				"mac"		"38"
 			}
 			"WeaponEquip"
 			{
