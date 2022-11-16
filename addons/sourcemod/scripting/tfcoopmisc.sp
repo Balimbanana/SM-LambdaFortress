@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.03"
+#define PLUGIN_VERSION "1.04"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -151,7 +151,7 @@ public Action Command_CallVoteBlock(int client, int args)
 {
 	if (args > 0)
 	{
-		static char szArg[32];
+		static char szArg[128];
 		GetCmdArg(1, szArg, sizeof(szArg));
 		if (StrEqual(szArg, "kick", false))
 		{
@@ -172,6 +172,12 @@ public Action Command_CallVoteBlock(int client, int args)
 					return Plugin_Handled;
 				}
 			}
+		}
+		GetCmdArgString(szArg, sizeof(szArg));
+		if ((StrContains(szArg, "sv_", false) != -1) || (StrContains(szArg, ";", false) != -1))
+		{
+			PrintToServer("%N attempted to use escape character using: '%s'", client, szArg);
+			return Plugin_Handled;
 		}
 	}
 	return Plugin_Continue;
