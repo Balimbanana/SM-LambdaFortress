@@ -23,6 +23,14 @@ ctf_coast_03_fixed
 				OnMapSpawn "boathouse_thumper_template,ForceSpawn,,0,-1"
 			}
 		}
+		create {classname "lfe_weapon_progress"
+			values
+			{
+				"wpnprogress" "2"
+				"physcannon_progress" "1"
+				"effects" "0"
+			}
+		}
 		create {classname "lfe_vehiclespawner" origin "-4970 -6220 635"
 			values
 			{
