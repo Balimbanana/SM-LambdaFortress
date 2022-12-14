@@ -6,7 +6,7 @@ ctf_foundry
 		create {classname "logic_auto"
 			values
 			{
-				OnMultiNewRound "concommand,Command,mp_gamemode 0,0,1"
+				OnMapSpawn "concommand,Command,mp_gamemode 0,0,1"
 			}
 		}
 	}

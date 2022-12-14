@@ -12,7 +12,7 @@ ctf_coast_03_fixed
 			values
 			{
 				OnMapSpawn "house1_door1,Unlock,,1,-1"
-				OnMultiNewRound "concommand,Command,mp_gamemode 0,0,1"
+				OnMapSpawn "concommand,Command,mp_gamemode 0,0,1"
 				
 				OnMapSpawn "citizen_tower_guy_template,ForceSpawn,,0,-1"
 				OnMapSpawn "nlo_occluder,Deactivate,,0,-1"
