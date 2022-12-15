@@ -23,7 +23,7 @@ ctf_coast_03_fixed
 				OnMapSpawn "spypost_template,ForceSpawn,,0,-1"
 				OnMapSpawn "boathouse_thumper_template,ForceSpawn,,0,-1"
 				
-				OnMapSpawn "gunship_spawner_2,ForceSpawn,,0,-1"
+				OnMapSpawn "gunship_spawner_2,Spawn,,0,-1"
 				OnMapSpawn "gunship1,FlyToSpecificTrackViaPath,path_b_16,1,-1"
 				OnMapSpawn "gunship1,StartPatrol,,4,-1"
 			}
