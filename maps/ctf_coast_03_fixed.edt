@@ -144,6 +144,8 @@ ctf_coast_03_fixed
 		delete {targetname "citizen_a_medic_original"}
 		delete {targetname "citizen_b_medic_original"}
 		delete {targetname "citizen_a_ammo_original"}
+		delete {classname "npc_citizen" origin "8552 4416 256"}
+		delete {classname "npc_citizen" origin "8487.38 4381.08 257"}
 		delete {targetname "gunship_arrival_relay"}
 		delete {targetname "rocketman"}
 		delete {targetname "ss_gordongreet"}
