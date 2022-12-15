@@ -22,6 +22,10 @@ ctf_coast_03_fixed
 				OnMapSpawn "lr_binoc_scene_cleanup,Trigger,,0,-1"
 				OnMapSpawn "spypost_template,ForceSpawn,,0,-1"
 				OnMapSpawn "boathouse_thumper_template,ForceSpawn,,0,-1"
+				
+				OnMapSpawn "gunship_spawner_2,ForceSpawn,,0,-1"
+				OnMapSpawn "gunship1,FlyToSpecificTrackViaPath,path_b_16,1,-1"
+				OnMapSpawn "gunship1,StartPatrol,,4,-1"
 			}
 		}
 		create {classname "lfe_weapon_progress"
@@ -84,6 +88,7 @@ ctf_coast_03_fixed
 		delete {classname "trigger_once" origin "4208.77 6380.16 -64"}
 		delete {classname "trigger_once" origin "-6656 8704 64"}
 		delete {classname "trigger_once" origin "-4540.2 2560 602.67"}
+		delete {targetname "telescope_button"}
 		delete {targetname "lcs_actbusy_post3_2"}
 		delete {targetname "trigger_post3"}
 		delete {targetname "ss_post3"}
@@ -109,6 +114,22 @@ ctf_coast_03_fixed
 		delete {targetname "blackcrab_1"}
 		delete {targetname "blackcrab_2"}
 		delete {targetname "poison_zombie"}
+		create {classname "npc_maker" origin "-3427 -6149 788"
+			values
+			{
+				maxnpccount "2"
+				spawnfrequency "10"
+				maxlivechildren "2"
+				spawnflags "48"
+				startdisabled "0"
+				angles "0 110 0"
+				npctype "npc_citizen"
+				npctargetname "redroof"
+				npcsquadname "redroofers"
+				additionalequipment "weapon_smg1"
+			}
+		}
+		
 		// BLU
 		delete {classname "prop_physics" origin "8338.47 4535.45 400.254"}
 		delete {classname "prop_physics" origin "8306 4540.49 420"}
@@ -116,11 +137,14 @@ ctf_coast_03_fixed
 		delete {classname "prop_physics" origin "8338.46 4284.3 394.605"}
 		delete {classname "prop_physics" origin "8338.46 4284.3 394.6"}
 		delete {classname "prop_physics" origin "8324 4484 394.605"}
+		delete {classname "trigger_once" origin "8852 4376 276.08"}
+		delete {targetname "basement_template"}
 		delete {targetname "citizen_a_regular_original"}
 		delete {targetname "citizen_b_regular_original"}
 		delete {targetname "citizen_a_medic_original"}
 		delete {targetname "citizen_b_medic_original"}
 		delete {targetname "citizen_a_ammo_original"}
+		delete {targetname "gunship_arrival_relay"}
 		delete {targetname "rocketman"}
 		delete {targetname "ss_gordongreet"}
 		delete {targetname "vort"}
