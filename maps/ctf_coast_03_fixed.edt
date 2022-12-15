@@ -13,6 +13,7 @@ ctf_coast_03_fixed
 			{
 				OnMapSpawn "house1_door1,Unlock,,1,-1"
 				OnMapSpawn "concommand,Command,mp_gamemode 0,0,1"
+				//OnMultiNewRound "concommand,Command,mp_gamemode 0,0,1"
 				
 				OnMapSpawn "citizen_tower_guy_template,ForceSpawn,,0,-1"
 				OnMapSpawn "nlo_occluder,Deactivate,,0,-1"
@@ -66,6 +67,15 @@ ctf_coast_03_fixed
 				angles "0 180 0"
 			}
 		}
+		
+		edit {targetname "barrel_1" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_2" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_3" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_4" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_5" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_6" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_7" values {classname "prop_physics_respawnable" RespawnTime "60"} }
+		edit {targetname "barrel_8" values {classname "prop_physics_respawnable" RespawnTime "60"} }
 
 		delete {classname "info_player_start"}
 		delete {classname "trigger_once" origin "8192 2688 384"}
@@ -157,8 +167,9 @@ ctf_coast_03_fixed
 		create {classname "func_regenerate" origin "8309 4616 438"
 			values
 			{
-				edt_getbspmodelfor_classname "trigger_once"
-				edt_getbspmodelfor_origin "8894 4064 310"
+				//edt_getbspmodelfor_classname "trigger_once"
+				//edt_getbspmodelfor_origin "8894 4064 310"
+				model "*130"
 				TeamNum "3"
 				OnStartTouch "bluregendynamic,SetAnimation,Open,0,-1"
 				OnEndTouchAll "bluregendynamic,SetAnimation,Close,0,-1"
@@ -285,8 +296,9 @@ ctf_coast_03_fixed
 		create {classname "func_regenerate" origin "-3685 -6058 506"
 			values
 			{
-				edt_getbspmodelfor_classname "trigger_once"
-				edt_getbspmodelfor_origin "8894 4064 310"
+				//edt_getbspmodelfor_classname "trigger_once"
+				//edt_getbspmodelfor_origin "8894 4064 310"
+				model "*130"
 				TeamNum "2"
 				OnStartTouch "redregendynamic,SetAnimation,Open,0,-1"
 				OnEndTouchAll "redregendynamic,SetAnimation,Close,0,-1"

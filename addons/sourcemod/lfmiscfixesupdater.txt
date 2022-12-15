@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.05"
-			"Previous"	"1.04"
+			"Latest"  	"1.06"
+			"Previous"	"1.05"
 		}
 		
-		"Notes"	"Block major security hole allowing clients to execute server commands through escape character."
+		"Notes"	"Fixed blue team kill feed."
 	}
 	
 	"Files"

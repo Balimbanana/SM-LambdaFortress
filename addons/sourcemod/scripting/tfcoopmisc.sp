@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.05"
+#define PLUGIN_VERSION "1.06"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -68,6 +68,12 @@ public void OnPluginStart()
 	{
 		HookEventEx("player_connect", EventHookPlayerConnect, EventHookMode_Pre);
 	}
+	HookEventEx("player_hurt", OnPlayerHurt, EventHookMode_Pre);
+	HookEventEx("npc_hurt", OnNPCHurt, EventHookMode_Pre);
+	
+	HookEventEx("npc_death", OnNPCDeath, EventHookMode_Pre);
+	HookEventEx("player_death", OnPlayerDeath, EventHookMode_Pre);
+	RegServerCmd("createbot", createbot);
 	CreateTimer(0.1, resetdev, _, TIMER_REPEAT);
 	
 	sv_vote_issue_kick_allowed = FindConVar("sv_vote_issue_kick_allowed");
@@ -265,41 +271,44 @@ public Action OnTakeDamage(int victim, int& attacker, int& inflictor, float& dam
 		}
 	}
 	
-	// Prevent damage from players holding enemy turrets and manhacks
-	GetEntityClassname(inflictor, szClassname, sizeof(szClassname));
-	if ((StrEqual(szClassname, "npc_turret_floor", false)) || (StrEqual(szClassname, "npc_manhack", false)))
+	if (IsValidEntity(inflictor))
 	{
-		if (HasEntProp(inflictor, Prop_Data, "m_bCarriedByPlayer"))
+		// Prevent damage from players holding enemy turrets and manhacks
+		GetEntityClassname(inflictor, szClassname, sizeof(szClassname));
+		if ((StrEqual(szClassname, "npc_turret_floor", false)) || (StrEqual(szClassname, "npc_manhack", false)))
 		{
-			if ((GetEntProp(inflictor, Prop_Data, "m_bCarriedByPlayer") != 0) || ((attacker < MaxClients+1) && (attacker > 0)))
+			if (HasEntProp(inflictor, Prop_Data, "m_bCarriedByPlayer"))
 			{
-				damage = 0.0;
-				return Plugin_Changed;
+				if ((GetEntProp(inflictor, Prop_Data, "m_bCarriedByPlayer") != 0) || ((attacker < MaxClients+1) && (attacker > 0)))
+				{
+					damage = 0.0;
+					return Plugin_Changed;
+				}
+			}
+			if (HasEntProp(inflictor, Prop_Data, "m_bHeld"))
+			{
+				if (GetEntProp(inflictor, Prop_Data, "m_bHeld") != 0)
+				{
+					damage = 0.0;
+					return Plugin_Changed;
+				}
 			}
 		}
-		if (HasEntProp(inflictor, Prop_Data, "m_bHeld"))
+		else if (StrEqual(szClassname, "simple_physics_prop", false))
 		{
-			if (GetEntProp(inflictor, Prop_Data, "m_bHeld") != 0)
-			{
-				damage = 0.0;
-				return Plugin_Changed;
-			}
+			damage = 0.0;
+			return Plugin_Changed;
 		}
-	}
-	else if (StrEqual(szClassname, "simple_physics_prop", false))
-	{
-		damage = 0.0;
-		return Plugin_Changed;
-	}
-	else if ((StrEqual(szClassname, "prop_vehicle_jeep", false)) || (StrEqual(szClassname, "prop_vehicle_airboat", false)))
-	{
-		// Prevent damage taken from unmanned vehicles, this prevents players taking damage from lfe_createvehicle
-		if (HasEntProp(attacker, Prop_Data, "m_hPlayer"))
+		else if ((StrEqual(szClassname, "prop_vehicle_jeep", false)) || (StrEqual(szClassname, "prop_vehicle_airboat", false)))
 		{
-			if (!IsValidEntity(GetEntPropEnt(attacker, Prop_Data, "m_hPlayer")))
+			// Prevent damage taken from unmanned vehicles, this prevents players taking damage from lfe_createvehicle
+			if (HasEntProp(attacker, Prop_Data, "m_hPlayer"))
 			{
-				damage = 0.0;
-				return Plugin_Changed;
+				if (!IsValidEntity(GetEntPropEnt(attacker, Prop_Data, "m_hPlayer")))
+				{
+					damage = 0.0;
+					return Plugin_Changed;
+				}
 			}
 		}
 	}
@@ -374,6 +383,157 @@ public void OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 	CreateTimer(0.1, everyspawnpost, client, TIMER_FLAG_NO_MAPCHANGE);
 	
 	return;
+}
+
+bool bHandledNextFirePly = false;
+bool bHandledNextFire = false;
+
+public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
+{
+	int attacker = GetEventInt(event, "attacker_index");
+	int health = GetEventInt(event, "health");
+	if ((IsValidEntity(attacker)) && (health == 0))
+	{
+		if ((attacker > 0) && (attacker < MaxClients+1))
+		{
+			int iTeamNum = GetEntProp(attacker, Prop_Send, "m_iTeamNum");
+			if (iTeamNum == 3)
+			{
+				Handle player_death = CreateEvent("player_death");
+				if (player_death != INVALID_HANDLE)
+				{
+					int victim = GetEventInt(event, "victim_index");
+					SetEventInt(player_death, "userid", GetClientUserId(attacker));
+					int m_Item = 0;
+					int iWeapon = GetEntPropEnt(attacker, Prop_Data, "m_hActiveWeapon");
+					if (IsValidEntity(iWeapon))
+					{
+						if (HasEntProp(iWeapon, Prop_Send, "m_Item")) m_Item = GetEntProp(iWeapon, Prop_Send, "m_Item");
+					}
+					SetEventInt(player_death, "weapon_def_index", m_Item);
+					
+					SetEventInt(player_death, "victim_entindex", victim);
+					SetEventInt(player_death, "attacker", attacker);
+					
+					SetEventInt(player_death, "inflictor_entindex", iWeapon);
+					char szWeapon[64];
+					GetClientWeapon(attacker, szWeapon, sizeof(szWeapon));
+					ReplaceStringEx(szWeapon, sizeof(szWeapon), "tf_weapon_", "", -1, -1, false);
+					if ((StrContains(szWeapon, "pistol", false) != -1) || (StrContains(szWeapon, "handgun", false) != -1)) Format(szWeapon, sizeof(szWeapon), "pistol");
+					SetEventString(player_death, "weapon", szWeapon);
+					SetEventInt(player_death, "weaponid", GetEventInt(event, "weaponid"));
+					SetEventInt(player_death, "damagebits", DMG_BULLET);
+					SetEventInt(player_death, "customkill", 0);
+					SetEventString(player_death, "weapon_logclassname", szWeapon);
+					//Also has minicrit allseecrit
+					SetEventInt(player_death, "crit_type", GetEventInt(event, "crit"));
+					SetEventInt(player_death, "victim_index", victim);
+					SetEventInt(player_death, "attacker_index", attacker);
+					SetEventString(player_death, "attacker_name", "player");
+					SetEventInt(player_death, "attacker_team", iTeamNum);
+					
+					// TODO: Assisters
+					SetEventInt(player_death, "assister_index", -1);
+					//SetEventString(player_death, "assister_name", "player");
+					//SetEventInt(player_death, "assister_team", //GetTeam
+					SetEventInt(player_death, "assister", -1);
+					
+					FireEvent(player_death, false);
+					
+					bHandledNextFirePly = true;
+				}
+			}
+		}
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action OnNPCHurt(Handle event, const char[] name, bool dontBroadcast)
+{
+	int attacker = GetEventInt(event, "attacker_index");
+	int health = GetEventInt(event, "health");
+	
+	if ((IsValidEntity(attacker)) && (health == 0))
+	{
+		if ((attacker > 0) && (attacker < MaxClients+1))
+		{
+			int iTeamNum = GetEntProp(attacker, Prop_Send, "m_iTeamNum");
+			if (iTeamNum == 3)
+			{
+				Handle npc_death = CreateEvent("npc_death");
+				if (npc_death != INVALID_HANDLE)
+				{
+					char szName[64];
+					char szClass[64];
+					int victim = GetEventInt(event, "victim_index");
+					SetEventInt(npc_death, "victim_index", victim);
+					GetEntityClassname(victim, szClass, sizeof(szClass));
+					SetEventString(npc_death, "victim_name", szClass);
+					GetEntPropString(victim, Prop_Data, "m_iName", szName, sizeof(szName));
+					SetEventString(npc_death, "victim_entname", szName);
+					SetEventInt(npc_death, "victim_team", GetEntProp(victim, Prop_Send, "m_iTeamNum"));
+					SetEventInt(npc_death, "attacker_index", attacker);
+					SetEventString(npc_death, "attacker_name", "player");
+					SetEventInt(npc_death, "attacker_team", iTeamNum);
+					
+					char szWeapon[64];
+					GetClientWeapon(attacker, szWeapon, sizeof(szWeapon));
+					ReplaceStringEx(szWeapon, sizeof(szWeapon), "tf_weapon_", "", -1, -1, false);
+					if ((StrContains(szWeapon, "pistol", false) != -1) || (StrContains(szWeapon, "handgun", false) != -1)) Format(szWeapon, sizeof(szWeapon), "pistol");
+					SetEventString(npc_death, "weapon", szWeapon);
+					SetEventInt(npc_death, "weaponid", GetEventInt(event, "weaponid"));
+					SetEventString(npc_death, "weapon_logclassname", szWeapon);
+					SetEventInt(npc_death, "damagebits", DMG_BULLET);
+					SetEventInt(npc_death, "customkill", 0);
+					
+					// TODO: Assister
+					SetEventInt(npc_death, "assister_index", -1);
+					SetEventString(npc_death, "assister_name", "");
+					SetEventInt(npc_death, "assister_team", 0);
+					FireEvent(npc_death, false);
+					
+					bHandledNextFire = true;
+				}
+			}
+		}
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action OnNPCDeath(Handle event, const char[] name, bool dontBroadcast)
+{
+	if (bHandledNextFire && (GetEventInt(event, "attacker_team") == 3) && (GetEventInt(event, "attacker_index") == 0))
+	{
+		bHandledNextFire = false;
+		return Plugin_Handled;
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action createbot(int args)
+{
+	int iBot = CreateFakeClient("Bot01");
+	if (IsValidEntity(iBot))
+	{
+		DispatchSpawn(iBot);
+		ActivateEntity(iBot);
+		SetEntProp(iBot, Prop_Send, "m_iClass", GetRandomInt(0, 9));
+	}
+	return Plugin_Handled;
+}
+
+public Action OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+{
+	if (bHandledNextFirePly && (GetEventInt(event, "attacker_team") == 3) && (GetEventInt(event, "inflictor_entindex") == 0))
+	{
+		bHandledNextFirePly = false;
+		return Plugin_Handled;
+	}
+	
+	return Plugin_Continue;
 }
 
 public Action resetdev(Handle timer)
