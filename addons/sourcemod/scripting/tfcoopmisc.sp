@@ -399,6 +399,8 @@ public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
 			int iTeamNum = GetEntProp(attacker, Prop_Send, "m_iTeamNum");
 			if (iTeamNum == 3)
 			{
+				if (GetEntPropEnt(attacker, Prop_Data, "m_hVehicle") != -1) return Plugin_Continue;
+				
 				Handle player_death = CreateEvent("player_death");
 				if (player_death != INVALID_HANDLE)
 				{
@@ -461,6 +463,8 @@ public Action OnNPCHurt(Handle event, const char[] name, bool dontBroadcast)
 			int iTeamNum = GetEntProp(attacker, Prop_Send, "m_iTeamNum");
 			if (iTeamNum == 3)
 			{
+				if (GetEntPropEnt(attacker, Prop_Data, "m_hVehicle") != -1) return Plugin_Continue;
+				
 				Handle npc_death = CreateEvent("npc_death");
 				if (npc_death != INVALID_HANDLE)
 				{
