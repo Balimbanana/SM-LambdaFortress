@@ -599,9 +599,9 @@ public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float&
 				SetEntProp(hPlayer, Prop_Data, "m_iHealth", GetEntProp(hPlayer, Prop_Data, "m_iHealth") - RoundFloat(damage/1.5));
 				if (GetEntProp(hPlayer, Prop_Data, "m_iHealth") <= 0)
 				{
-					AcceptEntityInput(victim, "ExitVehicle");
-					SetEntPropEnt(hPlayer, Prop_Data, "m_hVehicle", -1);
-					SetEntPropEnt(victim, Prop_Data, "m_hPlayer", -1);
+					AcceptEntityInput(victim, "ExitVehicleImmediate");
+					//SetEntPropEnt(hPlayer, Prop_Data, "m_hVehicle", -1);
+					//SetEntPropEnt(victim, Prop_Data, "m_hPlayer", -1);
 					SDKHooks_TakeDamage(hPlayer, attacker, inflictor, damage, damagetype, -1, NULL_VECTOR, vecOrigin);
 					FireEntityOutput(victim, "PlayerOff", -1, 0.0);
 				}
