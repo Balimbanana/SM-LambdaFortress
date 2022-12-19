@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.06"
-			"Previous"	"1.05"
+			"Latest"  	"1.07"
+			"Previous"	"1.06"
 		}
 		
-		"Notes"	"Fixed blue team kill feed."
+		"Notes"	"Enabled being damaged in vehicles. Added removal timer of broken entity created by pomson."
 	}
 	
 	"Files"

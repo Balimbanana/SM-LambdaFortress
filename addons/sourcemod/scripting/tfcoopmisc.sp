@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.06"
+#define PLUGIN_VERSION "1.07"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -16,6 +16,7 @@
 ConVar sv_vote_issue_kick_allowed, sv_vote_issue_ban_allowed;
 ConVar sv_cheats;
 float LastCmdRestrict[128];
+float flRemoveEntity[2048];
 
 public Plugin myinfo =
 {
@@ -75,6 +76,7 @@ public void OnPluginStart()
 	HookEventEx("player_death", OnPlayerDeath, EventHookMode_Pre);
 	RegServerCmd("createbot", createbot);
 	CreateTimer(0.1, resetdev, _, TIMER_REPEAT);
+	CreateTimer(1.0, RemovalEntities, _, TIMER_REPEAT);
 	
 	sv_vote_issue_kick_allowed = FindConVar("sv_vote_issue_kick_allowed");
 	sv_vote_issue_ban_allowed = FindConVar("sv_vote_issue_ban_allowed");
@@ -104,6 +106,14 @@ public void OnPluginStart()
 			if (IsValidEntity(iEntity))
 			{
 				SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnCombineNPCTakeDamage);
+			}
+		}
+		iEntity = -1;
+		while ((iEntity = FindEntityByClassname(iEntity, "prop_vehicle_jeep")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(iEntity))
+			{
+				SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnJeepTakeDamage);
 			}
 		}
 	}
@@ -339,8 +349,22 @@ public void OnEntityCreated(int iEntity, const char[] szClassname)
 	{
 		SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnCombineNPCTakeDamage);
 	}
+	else if (StrEqual(szClassname, "prop_vehicle_jeep", false))
+	{
+		SDKHookEx(iEntity, SDKHook_OnTakeDamage, OnJeepTakeDamage);
+	}
+	else if (StrEqual(szClassname, "tf_projectile_energy_ring", false))
+	{
+		flRemoveEntity[iEntity] = GetGameTime() + 4.0;
+	}
 	
 	return;
+}
+
+public void OnEntityDestroyed(int iEntity)
+{
+	if ((iEntity > 0) && (iEntity <= 2048))
+		flRemoveEntity[iEntity] = 0.0;
 }
 
 public Action OnCombineNPCTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype)
@@ -538,6 +562,73 @@ public Action OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 	}
 	
 	return Plugin_Continue;
+}
+
+public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype)
+{
+	if (IsValidEntity(attacker))
+	{
+		if (HasEntProp(victim, Prop_Data, "m_hPlayer"))
+		{
+			int hPlayer = GetEntPropEnt(victim, Prop_Data, "m_hPlayer");
+			if ((IsValidEntity(hPlayer)) && (hPlayer > 0) && (hPlayer <= MaxClients))
+			{
+				if ((HasEntProp(attacker, Prop_Data, "m_iTeamNum")) && (HasEntProp(hPlayer, Prop_Data, "m_iTeamNum")))
+				{
+					int iPlayerTeam = GetEntProp(hPlayer, Prop_Data, "m_iTeamNum");
+					if (GetEntProp(attacker, Prop_Data, "m_iTeamNum") == iPlayerTeam)
+					{
+						return Plugin_Continue;
+					}
+					if (IsValidEntity(inflictor))
+					{
+						if (HasEntProp(inflictor, Prop_Data, "m_iTeamNum"))
+						{
+							if (GetEntProp(inflictor, Prop_Data, "m_iTeamNum") == iPlayerTeam)
+							{
+								return Plugin_Continue;
+							}
+						}
+					}
+				}
+				float vecOrigin[3];
+				if (HasEntProp(attacker, Prop_Data, "m_vecAbsOrigin"))
+				{
+					GetEntPropVector(attacker, Prop_Data, "m_vecAbsOrigin", vecOrigin);
+				}
+				SetEntProp(hPlayer, Prop_Data, "m_iHealth", GetEntProp(hPlayer, Prop_Data, "m_iHealth") - RoundFloat(damage/1.5));
+				if (GetEntProp(hPlayer, Prop_Data, "m_iHealth") <= 0)
+				{
+					AcceptEntityInput(victim, "ExitVehicle");
+					SetEntPropEnt(hPlayer, Prop_Data, "m_hVehicle", -1);
+					SetEntPropEnt(victim, Prop_Data, "m_hPlayer", -1);
+					SDKHooks_TakeDamage(hPlayer, attacker, inflictor, damage, damagetype, -1, NULL_VECTOR, vecOrigin);
+					FireEntityOutput(victim, "PlayerOff", -1, 0.0);
+				}
+			}
+		}
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action RemovalEntities(Handle timer)
+{
+	float flTime = GetGameTime();
+	for (int i = MaxClients+1; i < 2048; i++)
+	{
+		if (IsValidEntity(i))
+		{
+			if (flRemoveEntity[i] > 0.0)
+			{
+				if (flRemoveEntity[i] < flTime)
+				{
+					AcceptEntityInput(i, "kill");
+					flRemoveEntity[i] = 0.0;
+				}
+			}
+		}
+	}
 }
 
 public Action resetdev(Handle timer)
