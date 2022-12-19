@@ -216,6 +216,7 @@ ctf_coast_03_fixed
 		create {classname "info_player_teamspawn" origin "8483 4620 421" values {TeamNum "3" angles "0 180 0"} }
 		create {classname "info_player_teamspawn" origin "8463 4640 421" values {TeamNum "3" angles "0 180 0"} }
 		create {classname "info_player_teamspawn" origin "8463 4620 421" values {TeamNum "3" angles "0 180 0"} }
+		create {classname "tf_weapon_physcannon" origin "8463 4620 441" values {angles "0 0 0"} }
 		create {classname "prop_dynamic" origin "8405 4501 396"
 			values
 			{
@@ -345,6 +346,7 @@ ctf_coast_03_fixed
 		create {classname "info_player_teamspawn" origin "-3600 -5980 490" values {TeamNum "2" angles "0 -90 0"} }
 		create {classname "info_player_teamspawn" origin "-3600 -6015 490" values {TeamNum "2" angles "0 -90 0"} }
 		create {classname "info_player_teamspawn" origin "-3640 -6050 490" values {TeamNum "2" angles "0 -90 0"} }
+		create {classname "tf_weapon_physcannon" origin "-3640 -6050 500" values {angles "0 0 0"} }
 		create {classname "prop_dynamic" origin "-3584 -6111 464"
 			values
 			{
