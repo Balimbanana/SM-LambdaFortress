@@ -26,6 +26,7 @@ ctf_coast_03_fixed
 				OnMapSpawn "gunship_spawner_2,Spawn,,0,-1"
 				OnMapSpawn "gunship1,FlyToSpecificTrackViaPath,path_b_16,1,-1"
 				OnMapSpawn "gunship1,StartPatrol,,4,-1"
+				OnMapSpawn "func_occluder,Deactivate,,1,-1"
 			}
 		}
 		create {classname "lfe_weapon_progress"

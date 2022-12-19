@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.07"
-			"Previous"	"1.06"
+			"Latest"  	"1.08"
+			"Previous"	"1.07"
 		}
 		
-		"Notes"	"Enabled being damaged in vehicles. Added removal timer of broken entity created by pomson."
+		"Notes"	"."
 	}
 	
 	"Files"

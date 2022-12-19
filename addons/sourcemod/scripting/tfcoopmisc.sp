@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.07"
+#define PLUGIN_VERSION "1.08"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -17,6 +17,25 @@ ConVar sv_vote_issue_kick_allowed, sv_vote_issue_ban_allowed;
 ConVar sv_cheats;
 float LastCmdRestrict[128];
 float flRemoveEntity[2048];
+float g_flNoRecreate = 0.0;
+int iHasRunTwice = 0;
+
+enum
+{
+	CLASS_NONE = 0,
+	CLASS_SCOUT = 1,
+	CLASS_SNIPER = 2,
+	CLASS_SOLDIER = 3,
+	CLASS_DEMOMAN = 4,
+	CLASS_MEDIC = 5,
+	CLASS_HEAVY = 6,
+	CLASS_PYRO = 7,
+	CLASS_SPY = 8,
+	CLASS_ENGINEER = 9,
+	CLASS_CITIZEN = 10,
+	CLASS_COMBINE = 11,
+	MAX_CLASSES = CLASS_COMBINE
+};
 
 public Plugin myinfo =
 {
@@ -61,6 +80,7 @@ public void OnPluginStart()
 	RegConsoleCmd("lfe_createvehicle", LFECreateVehicle);
 	// Prevent certain taunts
 	RegConsoleCmd("taunt_by_name", blocktaunt);
+	RegConsoleCmd("taunt", killtaunt);
 	// Fix CVars to actually apply correctly
 	RegConsoleCmd("callvote", Command_CallVoteBlock);
 	
@@ -71,7 +91,16 @@ public void OnPluginStart()
 	}
 	HookEventEx("player_hurt", OnPlayerHurt, EventHookMode_Pre);
 	HookEventEx("npc_hurt", OnNPCHurt, EventHookMode_Pre);
-	
+	HookEventEx("teamplay_round_win", OnRoundEnd, EventHookMode_Pre);
+	/*
+	HookEventEx("teamplay_round_stalemate", OnRoundEnd, EventHookMode_Pre);
+	HookEventEx("teamplay_game_over", OnRoundEnd, EventHookMode_Pre);
+	HookEventEx("teamplay_win_panel", OnRoundEnd, EventHookMode_Pre);
+	HookEventEx("arena_win_panel", OnRoundEnd, EventHookMode_Pre);
+	HookEventEx("pve_win_panel", OnRoundEnd, EventHookMode_Pre);
+	*/
+	HookEventEx("teamplay_round_start", OnRoundReset, EventHookMode_Post);
+	HookEventEx("arena_round_start", OnRoundReset, EventHookMode_Post);
 	HookEventEx("npc_death", OnNPCDeath, EventHookMode_Pre);
 	HookEventEx("player_death", OnPlayerDeath, EventHookMode_Pre);
 	RegServerCmd("createbot", createbot);
@@ -119,6 +148,18 @@ public void OnPluginStart()
 	}
 }
 
+public void OnMapStart()
+{
+	iHasRunTwice = 0;
+	g_flNoRecreate = GetTickedTime() + 9999.0;
+	HookEntityOutput("logic_auto", "OnMapSpawn", OnMapSpawn);
+}
+
+public Action OnMapSpawn(const char[] output, int caller, int activator, float delay)
+{
+	g_flNoRecreate = GetTickedTime() + 10.0;
+}
+
 public void OnLibraryAdded(const char[] name)
 {
 	if (StrEqual(name,"updater",false))
@@ -139,6 +180,7 @@ public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
 	ClientCommand(client, "alias bot_add \"echo \"\"");
 	ClientCommand(client, "alias bot_add_tf \"echo \"\"");
 	ClientCommand(client, "alias bot_kick \"echo \"\"");
+	ClientCommand(client, "alias alias sv_shutdown \"echo nope\"");
 	ClientCommand(client, "alias sv_shutdown \"echo nope\"");
 	QueryClientConVar(client, "sv_cheats", clcheat, 0);
 	
@@ -357,6 +399,10 @@ public void OnEntityCreated(int iEntity, const char[] szClassname)
 	{
 		flRemoveEntity[iEntity] = GetGameTime() + 4.0;
 	}
+	else if (StrEqual(szClassname, "tf_projectile_healing_bolt", false))
+	{
+		SDKHookEx(iEntity, SDKHook_Touch, HealingBoltStartTouch);
+	}
 	
 	return;
 }
@@ -364,7 +410,94 @@ public void OnEntityCreated(int iEntity, const char[] szClassname)
 public void OnEntityDestroyed(int iEntity)
 {
 	if ((iEntity > 0) && (iEntity <= 2048))
+	{
 		flRemoveEntity[iEntity] = 0.0;
+		if (g_flNoRecreate < GetTickedTime())
+		{
+			if (iHasRunTwice < 2)
+			{
+				iHasRunTwice++;
+				g_flNoRecreate = GetTickedTime() + 2.0;
+				return;
+			}
+			if (IsValidEntity(iEntity))
+			{
+				char szClassname[32];
+				GetEntityClassname(iEntity, szClassname, sizeof(szClassname));
+				if ((StrEqual(szClassname, "item_teamflag", false)) && (HasEntProp(iEntity, Prop_Data, "m_iTeamNum")))
+				{
+					float vecOrigin[3];
+					GetEntPropVector(iEntity, Prop_Data, "m_vecAbsOrigin", vecOrigin);
+					int iFlagTeam = GetEntProp(iEntity, Prop_Data, "m_iTeamNum");
+					int iEnt = -1;
+					while ((iEnt = FindEntityByClassname(iEnt, "func_capturezone")) != INVALID_ENT_REFERENCE)
+					{
+						if (IsValidEntity(iEnt))
+						{
+							if (HasEntProp(iEnt, Prop_Data, "m_iTeamNum"))
+							{
+								if (GetEntProp(iEnt, Prop_Data, "m_iTeamNum") == iFlagTeam)
+								{
+									GetEntPropVector(iEnt, Prop_Data, "m_vecAbsOrigin", vecOrigin);
+									vecOrigin[2] += 10.0;
+									break;
+								}
+							}
+						}
+					}
+					
+					int iRecreate = CreateEntityByName("item_teamflag");
+					if (IsValidEntity(iRecreate))
+					{
+						char szStat[64];
+						Format(szStat, sizeof(szStat), "%f", GetEntPropFloat(iEntity, Prop_Send, "m_flResetTime"));
+						DispatchKeyValue(iRecreate, "ReturnTime", szStat);
+						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nGameType"));
+						DispatchKeyValue(iRecreate, "GameType", szStat);
+						GetEntPropString(iEntity, Prop_Data, "m_szModel", szStat, sizeof(szStat));
+						DispatchKeyValue(iRecreate, "flag_model", szStat);
+						GetEntPropString(iEntity, Prop_Data, "m_szHudIcon", szStat, sizeof(szStat));
+						DispatchKeyValue(iRecreate, "flag_icon", szStat);
+						GetEntPropString(iEntity, Prop_Data, "m_szPaperEffect", szStat, sizeof(szStat));
+						DispatchKeyValue(iRecreate, "flag_paper", szStat);
+						GetEntPropString(iEntity, Prop_Data, "m_szTrailEffect", szStat, sizeof(szStat));
+						DispatchKeyValue(iRecreate, "flag_trail", szStat);
+						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nUseTrailEffect"));
+						DispatchKeyValue(iRecreate, "trail_effect", szStat);
+						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_bVisibleWhenDisabled"));
+						DispatchKeyValue(iRecreate, "VisibleWhenDisabled", szStat);
+						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_iTeamNum"));
+						DispatchKeyValue(iRecreate, "TeamNum", szStat);
+						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_fEffects"));
+						DispatchKeyValue(iRecreate, "effects", szStat);
+						
+						TeleportEntity(iRecreate, vecOrigin, NULL_VECTOR, NULL_VECTOR);
+						
+						DispatchSpawn(iRecreate);
+						ActivateEntity(iRecreate);
+					}
+				}
+			}
+		}
+	}
+}
+
+public Action HealingBoltStartTouch(int iEntity, int iOther)
+{
+	if (IsValidEntity(iOther))
+	{
+		AcceptEntityInput(iEntity, "kill");
+		// Heals 75
+		if (HasEntProp(iOther, Prop_Send, "m_iMaxHealth"))
+		{
+			int iMaxHealth = GetEntProp(iOther, Prop_Send, "m_iMaxHealth");
+			int iHealth = GetEntProp(iOther, Prop_Data, "m_iHealth");
+			if (iHealth + 75 > iMaxHealth) SetEntProp(iOther, Prop_Data, "m_iHealth", iMaxHealth);
+			else SetEntProp(iOther, Prop_Data, "m_iHealth", iHealth + 75);
+		}
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
 }
 
 public Action OnCombineNPCTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype)
@@ -612,6 +745,50 @@ public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float&
 	return Plugin_Continue;
 }
 
+public Action OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
+{
+	g_flNoRecreate = GetTickedTime() + 32.0;
+	return Plugin_Continue;
+}
+
+public Action OnRoundReset(Handle event, const char[] name, bool dontBroadcast)
+{
+	g_flNoRecreate = GetTickedTime() + 32.0;
+	int iEntity = CreateEntityByName("ai_relationship");
+	if (IsValidEntity(iEntity))
+	{
+		DispatchKeyValue(iEntity, "target", "npc_alyx");
+		DispatchKeyValue(iEntity, "subject", "tf_zombie");
+		DispatchKeyValue(iEntity, "disposition", "3");
+		DispatchKeyValue(iEntity, "rank", "999");
+		DispatchKeyValue(iEntity, "reciprocal", "1");
+		DispatchKeyValue(iEntity, "StartActive", "1");
+		
+		DispatchSpawn(iEntity);
+		ActivateEntity(iEntity);
+	}
+	iEntity = CreateEntityByName("ai_relationship");
+	if (IsValidEntity(iEntity))
+	{
+		DispatchKeyValue(iEntity, "target", "npc_alyx");
+		DispatchKeyValue(iEntity, "subject", "bot_npc_archer");
+		DispatchKeyValue(iEntity, "disposition", "3");
+		DispatchKeyValue(iEntity, "rank", "999");
+		DispatchKeyValue(iEntity, "reciprocal", "1");
+		DispatchKeyValue(iEntity, "StartActive", "1");
+		
+		DispatchSpawn(iEntity);
+		ActivateEntity(iEntity);
+	}
+	
+	return Plugin_Continue;
+}
+
+public void OnMapEnd()
+{
+	g_flNoRecreate = GetTickedTime() + 32.0;
+}
+
 public Action RemovalEntities(Handle timer)
 {
 	float flTime = GetGameTime();
@@ -686,13 +863,49 @@ public Action LFECreateVehicle(int client, int args)
 	return Plugin_Continue;
 }
 
+public Action killtaunt(int client, int args)
+{
+	if ((IsValidEntity(client)) && (client > 0))
+	{
+		if (HasEntProp(client, Prop_Send, "m_iClass"))
+		{
+			int iClass = GetEntProp(client, Prop_Send, "m_iClass");
+			if (iClass == CLASS_MEDIC)
+			{
+				return Plugin_Handled;
+			}
+		}
+	}
+	return Plugin_Continue;
+}
+
 public Action blocktaunt(int client, int args)
 {
 	if (args > 0)
 	{
+		if (IsValidEntity(client))
+		{
+			if (HasEntProp(client, Prop_Data, "m_hActiveWeapon"))
+			{
+				int iWeapon = GetEntPropEnt(client, Prop_Data, "m_hActiveWeapon");
+				if (IsValidEntity(iWeapon))
+				{
+					if (HasEntProp(iWeapon, Prop_Send, "m_Item"))
+					{
+						// UberSaw exploit
+						if (GetEntProp(iWeapon, Prop_Send, "m_Item") == 37)
+						{
+							return Plugin_Handled;
+						}
+					}
+				}
+			}
+		}
 		static char szArg[32];
 		GetCmdArg(1, szArg, sizeof(szArg));
-		if (StringToInt(szArg) < 1) return Plugin_Handled;
+		if ((StringToInt(szArg) < 1) && (!StrEqual(szArg, "default", false))) return Plugin_Handled;
+		
+		return Plugin_Continue;
 	}
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
