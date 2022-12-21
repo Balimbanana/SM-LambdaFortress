@@ -62,6 +62,9 @@ cp_d2_coast_03
 		delete {targetname "jeep"}
 		delete {targetname "player_spawn_items_maker"}
 		delete {targetname "player_spawn_items"}
+		delete {targetname "gman_template"}
+		delete {targetname "gman"}
+		delete {targetname "binoc_odessa"}
 		delete {targetname "lfe_sp_red2_trig"}
 		delete {targetname "lfe_sp_red3_trig"}
 		delete {classname "game_text_tf"}
