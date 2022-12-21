@@ -210,8 +210,8 @@ public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
 	ClientCommand(client, "alias bot_add \"echo \"\"");
 	ClientCommand(client, "alias bot_add_tf \"echo \"\"");
 	ClientCommand(client, "alias bot_kick \"echo \"\"");
-	ClientCommand(client, "alias alias sv_shutdown \"echo nope\"");
 	ClientCommand(client, "alias sv_shutdown \"echo nope\"");
+	ClientCommand(client, "alias \"alias sv_shutdown nope\"");
 	QueryClientConVar(client, "sv_cheats", clcheat, 0);
 	
 	return true;
@@ -684,6 +684,7 @@ public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
 					GetClientWeapon(attacker, szWeapon, sizeof(szWeapon));
 					ReplaceStringEx(szWeapon, sizeof(szWeapon), "tf_weapon_", "", -1, -1, false);
 					if ((StrContains(szWeapon, "pistol", false) != -1) || (StrContains(szWeapon, "handgun", false) != -1)) Format(szWeapon, sizeof(szWeapon), "pistol");
+					else if (StrEqual(szWeapon, "pep_brawler_blaster", false)) Format(szWeapon, sizeof(szWeapon), "pep_brawlerblaster");
 					SetEventString(player_death, "weapon", szWeapon);
 					SetEventInt(player_death, "weaponid", GetEventInt(event, "weaponid"));
 					SetEventInt(player_death, "damagebits", DMG_BULLET);
@@ -747,6 +748,7 @@ public Action OnNPCHurt(Handle event, const char[] name, bool dontBroadcast)
 					GetClientWeapon(attacker, szWeapon, sizeof(szWeapon));
 					ReplaceStringEx(szWeapon, sizeof(szWeapon), "tf_weapon_", "", -1, -1, false);
 					if ((StrContains(szWeapon, "pistol", false) != -1) || (StrContains(szWeapon, "handgun", false) != -1)) Format(szWeapon, sizeof(szWeapon), "pistol");
+					else if (StrEqual(szWeapon, "pep_brawler_blaster", false)) Format(szWeapon, sizeof(szWeapon), "pep_brawlerblaster");
 					SetEventString(npc_death, "weapon", szWeapon);
 					SetEventInt(npc_death, "weaponid", GetEventInt(event, "weaponid"));
 					SetEventString(npc_death, "weapon_logclassname", szWeapon);
@@ -948,6 +950,13 @@ public Action resetdev(Handle timer)
 						LogMessage("%N IsPlayerNicknine %s", i, SteamID);
 					}
 					SetEntProp(i, Prop_Send, "m_bIsPlayerNicknine", 0);
+				}
+				if (HasEntProp(i, Prop_Send, "m_flHypeMeter"))
+				{
+					if (GetEntPropFloat(i, Prop_Send, "m_flHypeMeter") < 0.0)
+					{
+						SetEntPropFloat(i, Prop_Send, "m_flHypeMeter", 0.0);
+					}
 				}
 			}
 		}
