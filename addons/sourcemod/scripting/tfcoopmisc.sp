@@ -88,6 +88,7 @@ public void OnPluginStart()
 	// Fix CVars to actually apply correctly
 	RegConsoleCmd("callvote", Command_CallVoteBlock);
 	RegConsoleCmd("join_class", Command_JoinClass);
+	RegConsoleCmd("joinclass", Command_JoinClass);
 	
 	HookEventEx("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	if (!HookEventEx("player_connect_client", EventHookPlayerConnect, EventHookMode_Pre))
@@ -118,7 +119,7 @@ public void OnPluginStart()
 	sv_cheats = FindConVar("sv_cheats");
 	
 	sv_class_cooldown = CreateConVar("sv_class_cooldown", "3.0", "Prevents changing classes too fast by this CVar amount.", _, true, 0.0, false);
-	g_CVarRespawnItemCrate = CreateConVar("sv_itemcrate_respawntime", "60.0", "Respawns item_item_crate after this many seconds, set to 0 to disable.", _, true, 0.0);
+	g_CVarRespawnItemCrate = CreateConVar("sv_itemcrate_respawntime", "0.0", "Respawns item_item_crate after this many seconds, set to 0 to disable.", _, true, 0.0);
 	
 	if (GetMapHistorySize() > -1)
 	{
