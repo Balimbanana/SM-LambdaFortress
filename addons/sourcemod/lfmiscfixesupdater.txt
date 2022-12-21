@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.08"
-			"Previous"	"1.07"
+			"Latest"  	"1.09"
+			"Previous"	"1.08"
 		}
 		
-		"Notes"	"."
+		"Notes"	"Added CVar sv_itemcrate_respawntime default 60 seconds and sv_class_cooldown default 3 seconds."
 	}
 	
 	"Files"

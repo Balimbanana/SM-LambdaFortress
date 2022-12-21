@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.08"
+#define PLUGIN_VERSION "1.09"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -15,10 +15,14 @@
 
 ConVar sv_vote_issue_kick_allowed, sv_vote_issue_ban_allowed;
 ConVar sv_cheats;
+ConVar sv_class_cooldown, g_CVarRespawnItemCrate;
 float LastCmdRestrict[128];
+float flLastClassChange[128];
 float flRemoveEntity[2048];
 float g_flNoRecreate = 0.0;
-int iHasRunTwice = 0;
+
+float vecOriginalItemPosition[2048][3];
+float vecOriginalItemAngles[2048][3];
 
 enum
 {
@@ -83,6 +87,7 @@ public void OnPluginStart()
 	RegConsoleCmd("taunt", killtaunt);
 	// Fix CVars to actually apply correctly
 	RegConsoleCmd("callvote", Command_CallVoteBlock);
+	RegConsoleCmd("join_class", Command_JoinClass);
 	
 	HookEventEx("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	if (!HookEventEx("player_connect_client", EventHookPlayerConnect, EventHookMode_Pre))
@@ -111,6 +116,9 @@ public void OnPluginStart()
 	sv_vote_issue_ban_allowed = FindConVar("sv_vote_issue_ban_allowed");
 	if (sv_vote_issue_ban_allowed == INVALID_HANDLE) sv_vote_issue_ban_allowed = CreateConVar("sv_vote_issue_ban_allowed", "0", "Enable voting to ban other players.", _, true, 0.0, true, 1.0);
 	sv_cheats = FindConVar("sv_cheats");
+	
+	sv_class_cooldown = CreateConVar("sv_class_cooldown", "3.0", "Prevents changing classes too fast by this CVar amount.", _, true, 0.0, false);
+	g_CVarRespawnItemCrate = CreateConVar("sv_itemcrate_respawntime", "60.0", "Respawns item_item_crate after this many seconds, set to 0 to disable.", _, true, 0.0);
 	
 	if (GetMapHistorySize() > -1)
 	{
@@ -150,14 +158,35 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
-	iHasRunTwice = 0;
-	g_flNoRecreate = GetTickedTime() + 9999.0;
-	HookEntityOutput("logic_auto", "OnMapSpawn", OnMapSpawn);
+	//HookEntityOutput("logic_auto", "OnMapSpawn", OnMapSpawn);
+	for (int i = MaxClients+1; i < 2048; i++)
+	{
+		vecOriginalItemPosition[i][0] = -1.0;
+	}
+	
+	if (GetMapHistorySize() > -1)
+	{
+		int iEnt = -1;
+		while ((iEnt = FindEntityByClassname(iEnt, "item_item_crate")) != INVALID_ENT_REFERENCE)
+		{
+			if (IsValidEntity(iEnt))
+			{
+				if (HasEntProp(iEnt, Prop_Data, "m_vecAbsOrigin"))
+				{
+					GetEntPropVector(iEnt, Prop_Data, "m_vecAbsOrigin", vecOriginalItemPosition[iEnt]);
+				}
+				if (HasEntProp(iEnt, Prop_Data, "m_angRotation"))
+				{
+					GetEntPropVector(iEnt, Prop_Data, "m_angRotation", vecOriginalItemAngles[iEnt]);
+				}
+			}
+		}
+	}
 }
 
 public Action OnMapSpawn(const char[] output, int caller, int activator, float delay)
 {
-	g_flNoRecreate = GetTickedTime() + 10.0;
+	
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -237,6 +266,21 @@ public Action Command_CallVoteBlock(int client, int args)
 			PrintToServer("%N attempted to use escape character using: '%s'", client, szArg);
 			return Plugin_Handled;
 		}
+	}
+	return Plugin_Continue;
+}
+
+public Action Command_JoinClass(int client, int args)
+{
+	if ((!IsValidEntity(client)) || (client == 0)) return Plugin_Continue;
+	if (flLastClassChange[client] < GetTickedTime())
+	{
+		flLastClassChange[client] = GetTickedTime() + sv_class_cooldown.FloatValue;
+	}
+	else
+	{
+		PrintToChat(client, "You cannot change classes for another %1.1f seconds!", flLastClassChange[client] - GetTickedTime());
+		return Plugin_Handled;
 	}
 	return Plugin_Continue;
 }
@@ -412,71 +456,131 @@ public void OnEntityDestroyed(int iEntity)
 	if ((iEntity > 0) && (iEntity <= 2048))
 	{
 		flRemoveEntity[iEntity] = 0.0;
-		if (g_flNoRecreate < GetTickedTime())
+		if ((IsValidEntity(iEntity)) && (g_flNoRecreate < GetTickedTime()))
 		{
-			if (iHasRunTwice < 2)
+			char szClassname[32];
+			GetEntityClassname(iEntity, szClassname, sizeof(szClassname));
+			if ((StrEqual(szClassname, "item_teamflag", false)) && (HasEntProp(iEntity, Prop_Data, "m_iTeamNum")))
 			{
-				iHasRunTwice++;
-				g_flNoRecreate = GetTickedTime() + 2.0;
-				return;
-			}
-			if (IsValidEntity(iEntity))
-			{
-				char szClassname[32];
-				GetEntityClassname(iEntity, szClassname, sizeof(szClassname));
-				if ((StrEqual(szClassname, "item_teamflag", false)) && (HasEntProp(iEntity, Prop_Data, "m_iTeamNum")))
+				if (HasEntProp(iEntity, Prop_Data, "m_hParent"))
 				{
-					float vecOrigin[3];
-					GetEntPropVector(iEntity, Prop_Data, "m_vecAbsOrigin", vecOrigin);
-					int iFlagTeam = GetEntProp(iEntity, Prop_Data, "m_iTeamNum");
-					int iEnt = -1;
-					while ((iEnt = FindEntityByClassname(iEnt, "func_capturezone")) != INVALID_ENT_REFERENCE)
+					int hParent = GetEntPropEnt(iEntity, Prop_Data, "m_hParent");
+					if (IsValidEntity(hParent))
 					{
-						if (IsValidEntity(iEnt))
+						float vecOrigin[3];
+						GetEntPropVector(iEntity, Prop_Data, "m_vecAbsOrigin", vecOrigin);
+						int iFlagTeam = GetEntProp(iEntity, Prop_Data, "m_iTeamNum");
+						int iEnt = -1;
+						while ((iEnt = FindEntityByClassname(iEnt, "func_capturezone")) != INVALID_ENT_REFERENCE)
 						{
-							if (HasEntProp(iEnt, Prop_Data, "m_iTeamNum"))
+							if (IsValidEntity(iEnt))
 							{
-								if (GetEntProp(iEnt, Prop_Data, "m_iTeamNum") == iFlagTeam)
+								if (HasEntProp(iEnt, Prop_Data, "m_iTeamNum"))
 								{
-									GetEntPropVector(iEnt, Prop_Data, "m_vecAbsOrigin", vecOrigin);
-									vecOrigin[2] += 10.0;
-									break;
+									if (GetEntProp(iEnt, Prop_Data, "m_iTeamNum") == iFlagTeam)
+									{
+										GetEntPropVector(iEnt, Prop_Data, "m_vecAbsOrigin", vecOrigin);
+										vecOrigin[2] += 10.0;
+										break;
+									}
 								}
 							}
 						}
-					}
-					
-					int iRecreate = CreateEntityByName("item_teamflag");
-					if (IsValidEntity(iRecreate))
-					{
-						char szStat[64];
-						Format(szStat, sizeof(szStat), "%f", GetEntPropFloat(iEntity, Prop_Send, "m_flResetTime"));
-						DispatchKeyValue(iRecreate, "ReturnTime", szStat);
-						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nGameType"));
-						DispatchKeyValue(iRecreate, "GameType", szStat);
-						GetEntPropString(iEntity, Prop_Data, "m_szModel", szStat, sizeof(szStat));
-						DispatchKeyValue(iRecreate, "flag_model", szStat);
-						GetEntPropString(iEntity, Prop_Data, "m_szHudIcon", szStat, sizeof(szStat));
-						DispatchKeyValue(iRecreate, "flag_icon", szStat);
-						GetEntPropString(iEntity, Prop_Data, "m_szPaperEffect", szStat, sizeof(szStat));
-						DispatchKeyValue(iRecreate, "flag_paper", szStat);
-						GetEntPropString(iEntity, Prop_Data, "m_szTrailEffect", szStat, sizeof(szStat));
-						DispatchKeyValue(iRecreate, "flag_trail", szStat);
-						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nUseTrailEffect"));
-						DispatchKeyValue(iRecreate, "trail_effect", szStat);
-						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_bVisibleWhenDisabled"));
-						DispatchKeyValue(iRecreate, "VisibleWhenDisabled", szStat);
-						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_iTeamNum"));
-						DispatchKeyValue(iRecreate, "TeamNum", szStat);
-						Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_fEffects"));
-						DispatchKeyValue(iRecreate, "effects", szStat);
 						
-						TeleportEntity(iRecreate, vecOrigin, NULL_VECTOR, NULL_VECTOR);
-						
-						DispatchSpawn(iRecreate);
-						ActivateEntity(iRecreate);
+						int iRecreate = CreateEntityByName("item_teamflag");
+						if (IsValidEntity(iRecreate))
+						{
+							char szStat[64];
+							Format(szStat, sizeof(szStat), "%f", GetEntPropFloat(iEntity, Prop_Send, "m_flResetTime"));
+							DispatchKeyValue(iRecreate, "ReturnTime", szStat);
+							Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nGameType"));
+							DispatchKeyValue(iRecreate, "GameType", szStat);
+							GetEntPropString(iEntity, Prop_Data, "m_szModel", szStat, sizeof(szStat));
+							DispatchKeyValue(iRecreate, "flag_model", szStat);
+							GetEntPropString(iEntity, Prop_Data, "m_szHudIcon", szStat, sizeof(szStat));
+							DispatchKeyValue(iRecreate, "flag_icon", szStat);
+							GetEntPropString(iEntity, Prop_Data, "m_szPaperEffect", szStat, sizeof(szStat));
+							DispatchKeyValue(iRecreate, "flag_paper", szStat);
+							GetEntPropString(iEntity, Prop_Data, "m_szTrailEffect", szStat, sizeof(szStat));
+							DispatchKeyValue(iRecreate, "flag_trail", szStat);
+							Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_nUseTrailEffect"));
+							DispatchKeyValue(iRecreate, "trail_effect", szStat);
+							Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_bVisibleWhenDisabled"));
+							DispatchKeyValue(iRecreate, "VisibleWhenDisabled", szStat);
+							Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_iTeamNum"));
+							DispatchKeyValue(iRecreate, "TeamNum", szStat);
+							Format(szStat, sizeof(szStat), "%i", GetEntProp(iEntity, Prop_Data, "m_fEffects"));
+							DispatchKeyValue(iRecreate, "effects", szStat);
+							
+							TeleportEntity(iRecreate, vecOrigin, NULL_VECTOR, NULL_VECTOR);
+							
+							DispatchSpawn(iRecreate);
+							ActivateEntity(iRecreate);
+						}
 					}
 				}
+			}
+			else if ((StrEqual(szClassname, "item_item_crate", false)) && (g_CVarRespawnItemCrate.FloatValue > 0.0))
+			{
+				if (vecOriginalItemPosition[iEntity][0] != -1.0)
+				{
+					char szStat[128];
+					Handle dp = CreateDataPack();
+					CreateDataTimer(g_CVarRespawnItemCrate.FloatValue, RespawnItemCrates, dp, TIMER_FLAG_NO_MAPCHANGE);
+					WritePackCell(dp, iEntity);
+					WritePackCell(dp, GetEntProp(iEntity, Prop_Data, "m_CrateType"));
+					WritePackCell(dp, GetEntProp(iEntity, Prop_Data, "m_nItemCount"));
+					WritePackCell(dp, GetEntProp(iEntity, Prop_Data, "m_CrateAppearance"));
+					WritePackCell(dp, GetEntProp(iEntity, Prop_Data, "m_nSkin"));
+					WritePackCell(dp, GetEntProp(iEntity, Prop_Data, "m_nBody"));
+					GetEntPropString(iEntity, Prop_Data, "m_strItemClass", szStat, sizeof(szStat));
+					WritePackString(dp, szStat);
+					GetEntPropString(iEntity, Prop_Data, "m_strAlternateMaster", szStat, sizeof(szStat));
+					WritePackString(dp, szStat);
+				}
+			}
+		}
+	}
+}
+
+public Action RespawnItemCrates(Handle timer, Handle dp)
+{
+	if (dp != INVALID_HANDLE)
+	{
+		ResetPack(dp);
+		int iIndex = ReadPackCell(dp);
+		if (vecOriginalItemPosition[iIndex][0] != -1.0)
+		{
+			int iRecreate = CreateEntityByName("item_item_crate");
+			if (IsValidEntity(iRecreate))
+			{
+				char szStat[128];
+				Format(szStat, sizeof(szStat), "%i", ReadPackCell(dp));
+				DispatchKeyValue(iRecreate, "CrateType", szStat);
+				Format(szStat, sizeof(szStat), "%i", ReadPackCell(dp));
+				DispatchKeyValue(iRecreate, "ItemCount", szStat);
+				Format(szStat, sizeof(szStat), "%i", ReadPackCell(dp));
+				DispatchKeyValue(iRecreate, "CrateAppearance", szStat);
+				Format(szStat, sizeof(szStat), "%i", ReadPackCell(dp));
+				DispatchKeyValue(iRecreate, "Skin", szStat);
+				Format(szStat, sizeof(szStat), "%i", ReadPackCell(dp));
+				DispatchKeyValue(iRecreate, "Body", szStat);
+				ReadPackString(dp, szStat, sizeof(szStat));
+				DispatchKeyValue(iRecreate, "ItemClass", szStat);
+				ReadPackString(dp, szStat, sizeof(szStat));
+				DispatchKeyValue(iRecreate, "SpecificResupply", szStat);
+				
+				TeleportEntity(iRecreate, vecOriginalItemPosition[iIndex], vecOriginalItemAngles[iIndex], NULL_VECTOR);
+				// Make new index
+				float vecCopy[3];
+				vecCopy[0] = vecOriginalItemPosition[iIndex][0];
+				vecCopy[1] = vecOriginalItemPosition[iIndex][1];
+				vecCopy[2] = vecOriginalItemPosition[iIndex][2];
+				vecOriginalItemPosition[iIndex][0] = -1.0;
+				vecOriginalItemPosition[iRecreate] = vecCopy;
+				
+				DispatchSpawn(iRecreate);
+				ActivateEntity(iRecreate);
 			}
 		}
 	}
@@ -694,6 +798,14 @@ public Action OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 		return Plugin_Handled;
 	}
 	
+	char szAttackerName[128];
+	GetEventString(event, "attacker_name", szAttackerName, sizeof(szAttackerName));
+	if (StrEqual(szAttackerName, "npc_rocket_turret", false))
+	{
+		SetEventString(event, "attacker_name", "Portal Rocket Turret");
+		return Plugin_Changed;
+	}
+	
 	return Plugin_Continue;
 }
 
@@ -729,7 +841,7 @@ public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float&
 				{
 					GetEntPropVector(attacker, Prop_Data, "m_vecAbsOrigin", vecOrigin);
 				}
-				SetEntProp(hPlayer, Prop_Data, "m_iHealth", GetEntProp(hPlayer, Prop_Data, "m_iHealth") - RoundFloat(damage/1.5));
+				SetEntProp(hPlayer, Prop_Data, "m_iHealth", GetEntProp(hPlayer, Prop_Data, "m_iHealth") - RoundFloat(damage/1.3));
 				if (GetEntProp(hPlayer, Prop_Data, "m_iHealth") <= 0)
 				{
 					AcceptEntityInput(victim, "ExitVehicleImmediate");
@@ -747,13 +859,12 @@ public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float&
 
 public Action OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
-	g_flNoRecreate = GetTickedTime() + 32.0;
+	g_flNoRecreate = GetTickedTime() + 30.0;
 	return Plugin_Continue;
 }
 
 public Action OnRoundReset(Handle event, const char[] name, bool dontBroadcast)
 {
-	g_flNoRecreate = GetTickedTime() + 32.0;
 	int iEntity = CreateEntityByName("ai_relationship");
 	if (IsValidEntity(iEntity))
 	{
@@ -786,7 +897,7 @@ public Action OnRoundReset(Handle event, const char[] name, bool dontBroadcast)
 
 public void OnMapEnd()
 {
-	g_flNoRecreate = GetTickedTime() + 32.0;
+	
 }
 
 public Action RemovalEntities(Handle timer)

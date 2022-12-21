@@ -29,6 +29,7 @@ ctf_coast_03_fixed
 				OnMapSpawn "func_occluder,Deactivate,,1,-1"
 			}
 		}
+		edit {classname "func_occluder" values {targetname "nooccluder"} }
 		create {classname "lfe_weapon_progress"
 			values
 			{
@@ -101,6 +102,9 @@ ctf_coast_03_fixed
 		delete {targetname "jeep"}
 		delete {targetname "player_spawn_items_maker"}
 		delete {targetname "player_spawn_items"}
+		delete {targetname "gman_template"}
+		delete {targetname "gman"}
+		delete {targetname "binoc_odessa"}
 		// RED
 		delete {classname "item_ammo_crate" origin "-3700 -6032 469.281"}
 		delete {classname "prop_physics" origin "-3700 -6020 517"}
