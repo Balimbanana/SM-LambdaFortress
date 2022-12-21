@@ -1,5 +1,9 @@
 ctf_coast_03_fixed
 {
+	console
+	{
+		sk_gunship_health_increments "12"
+	}
 	entity
 	{
 		edit {classname "func_areaportal" values {targetname "disabledPortals" startopen "1"} }
@@ -32,14 +36,7 @@ ctf_coast_03_fixed
 			}
 		}
 		edit {classname "func_occluder" values {targetname "nooccluder"} }
-		create {classname "lfe_weapon_progress"
-			values
-			{
-				"wpnprogress" "2"
-				"physcannon_progress" "1"
-				"effects" "0"
-			}
-		}
+
 		create {classname "lfe_vehiclespawner" origin "-4970 -6220 635"
 			values
 			{
@@ -100,6 +97,8 @@ ctf_coast_03_fixed
 		delete {targetname "citizen_b_regular_respawn"}
 		delete {targetname "citizen_a_ammo_respawn"}
 		delete {targetname "citizen_a_medic_respawn"}
+		delete {targetname "citizen_a_precmbt_1"}
+		delete {targetname "citizen_a_precmbt_2"}
 		delete {targetname "jeep_lost_in_water"}
 		delete {targetname "reload"}
 		delete {targetname "jeep"}
@@ -230,7 +229,9 @@ ctf_coast_03_fixed
 		create {classname "info_player_teamspawn" origin "8483 4620 421" values {TeamNum "3" angles "0 180 0"} }
 		create {classname "info_player_teamspawn" origin "8463 4640 421" values {TeamNum "3" angles "0 180 0"} }
 		create {classname "info_player_teamspawn" origin "8463 4620 421" values {TeamNum "3" angles "0 180 0"} }
-		create {classname "tf_weapon_physcannon" origin "8463 4620 441" values {angles "0 0 0"} }
+		create {classname "tf_weapon_physcannon" origin "8483 4620 441" values {angles "0 0 0"} }
+		create {classname "weapon_pistol" origin "8483 4640 421" values {angles "0 0 0"} }
+		create {classname "weapon_smg1" origin "8483 4640 421" values {angles "0 0 0"} }
 		create {classname "prop_dynamic" origin "8405 4501 396"
 			values
 			{
@@ -360,7 +361,9 @@ ctf_coast_03_fixed
 		create {classname "info_player_teamspawn" origin "-3600 -5980 490" values {TeamNum "2" angles "0 -90 0"} }
 		create {classname "info_player_teamspawn" origin "-3600 -6015 490" values {TeamNum "2" angles "0 -90 0"} }
 		create {classname "info_player_teamspawn" origin "-3640 -6050 490" values {TeamNum "2" angles "0 -90 0"} }
-		create {classname "tf_weapon_physcannon" origin "-3640 -6050 500" values {angles "0 0 0"} }
+		create {classname "tf_weapon_physcannon" origin "-3640 -5990 500" values {angles "0 0 0"} }
+		create {classname "weapon_pistol" origin "-3640 -5990 500" values {angles "0 0 0"} }
+		create {classname "weapon_smg1" origin "-3640 -5990 500" values {angles "0 0 0"} }
 		create {classname "prop_dynamic" origin "-3584 -6111 464"
 			values
 			{
