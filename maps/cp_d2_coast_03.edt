@@ -54,6 +54,7 @@ cp_d2_coast_03
 		delete {classname "trigger_once" origin "4208.77 6380.16 -64"}
 		delete {classname "trigger_once" origin "-6656 8704 64"}
 		delete {classname "trigger_once" origin "-4540.2 2560 602.67"}
+		delete {classname "trigger_once" origin "6048 2368 1984"}
 		delete {targetname "telescope_button"}
 		delete {targetname "lcs_actbusy_post3_2"}
 		delete {targetname "trigger_post3"}
