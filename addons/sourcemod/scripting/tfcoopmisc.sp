@@ -240,7 +240,8 @@ public Action Command_CallVoteBlock(int client, int args)
 	if (args > 0)
 	{
 		static char szArg[1024];
-		GetCmdArg(1, szArg, sizeof(szArg));
+		static char szArg1[128];
+		GetCmdArg(1, szArg1, sizeof(szArg1));
 		if (StrEqual(szArg, "kick", false))
 		{
 			if (sv_vote_issue_kick_allowed != INVALID_HANDLE)
@@ -266,6 +267,16 @@ public Action Command_CallVoteBlock(int client, int args)
 		{
 			PrintToServer("%N attempted to use escape character using: '%s'", client, szArg);
 			return Plugin_Handled;
+		}
+		
+		if (StrEqual(szArg1, "changedifficulty", false))
+		{
+			if (args > 1)
+			{
+				char szArg2[64];
+				GetCmdArg(2, szArg2, sizeof(szArg2));
+				if ((strlen(szArg2) > 1) || (args > 2)) return Plugin_Handled;
+			}
 		}
 	}
 	return Plugin_Continue;
