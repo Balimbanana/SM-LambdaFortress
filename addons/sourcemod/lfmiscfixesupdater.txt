@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"  	"1.09"
-			"Previous"	"1.08"
+			"Latest"  	"1.10"
+			"Previous"	"1.09"
 		}
 		
-		"Notes"	"Added CVar sv_itemcrate_respawntime default 60 seconds and sv_class_cooldown default 3 seconds."
+		"Notes"	"Remove weapon drops from players."
 	}
 	
 	"Files"

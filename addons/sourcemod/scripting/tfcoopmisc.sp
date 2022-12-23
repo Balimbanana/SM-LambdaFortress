@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.09"
+#define PLUGIN_VERSION "1.10"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -228,6 +228,14 @@ public void clcheat(QueryCookie cookie, int client, ConVarQueryResult result, co
 	}
 }
 
+public void clclassauto(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (StringToInt(cvarValue) <= 0)
+	{
+		ClientCommand(client, "hud_classautokill 1");
+	}
+}
+
 public Action blckserver(int client, int args)
 {
 	if (client == 0) return Plugin_Continue;
@@ -285,6 +293,7 @@ public Action Command_CallVoteBlock(int client, int args)
 public Action Command_JoinClass(int client, int args)
 {
 	if ((!IsValidEntity(client)) || (client == 0)) return Plugin_Continue;
+	QueryClientConVar(client, "hud_classautokill", clclassauto, 0);
 	if (flLastClassChange[client] < GetTickedTime())
 	{
 		flLastClassChange[client] = GetTickedTime() + sv_class_cooldown.FloatValue;
@@ -458,6 +467,10 @@ public void OnEntityCreated(int iEntity, const char[] szClassname)
 	else if (StrEqual(szClassname, "tf_projectile_healing_bolt", false))
 	{
 		SDKHookEx(iEntity, SDKHook_Touch, HealingBoltStartTouch);
+	}
+	else if (StrEqual(szClassname, "tf_dropped_weapon", false))
+	{
+		AcceptEntityInput(iEntity, "kill");
 	}
 	
 	return;
@@ -942,6 +955,7 @@ public Action resetdev(Handle timer)
 			if (IsClientInGame(i))
 			{
 				QueryClientConVar(i, "sv_cheats", clcheat, 0);
+				QueryClientConVar(i, "hud_classautokill", clclassauto, 0);
 				if (HasEntProp(i, Prop_Send, "m_bIsPlayerADev"))
 				{
 					if (GetEntProp(i, Prop_Send, "m_bIsPlayerADev"))
