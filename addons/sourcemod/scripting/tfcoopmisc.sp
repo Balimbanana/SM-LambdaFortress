@@ -918,6 +918,19 @@ public Action OnRoundReset(Handle event, const char[] name, bool dontBroadcast)
 		DispatchSpawn(iEntity);
 		ActivateEntity(iEntity);
 	}
+	iEntity = CreateEntityByName("ai_relationship");
+	if (IsValidEntity(iEntity))
+	{
+		DispatchKeyValue(iEntity, "target", "npc_alyx");
+		DispatchKeyValue(iEntity, "subject", "monster_gonome");
+		DispatchKeyValue(iEntity, "disposition", "3");
+		DispatchKeyValue(iEntity, "rank", "999");
+		DispatchKeyValue(iEntity, "reciprocal", "1");
+		DispatchKeyValue(iEntity, "StartActive", "1");
+		
+		DispatchSpawn(iEntity);
+		ActivateEntity(iEntity);
+	}
 	
 	return Plugin_Continue;
 }
