@@ -1,0 +1,556 @@
+"Games"
+{
+	"#default"
+	{
+		"Keys"
+		{
+			"IServerGameDLL"
+			{
+				"windows"	"ServerGameDLL008"
+				"linux"		"ServerGameDLL008"
+			}
+		}
+		
+		"Offsets"
+		{
+			"CServerGameDLL::LevelInit"
+			{
+				"windows"	"3"
+				"linux"		"3"
+			}
+			
+			// 5 Think(bool) or 6 PreClientUpdate(bool) Probably? They both spam a bit
+			"CServerGameDLL::LevelShutdown"
+			{
+				"windows"	"7"
+				"linux"		"7"
+			}
+			
+			"CTFPlayer::Spawn"
+			{
+				"windows"	"22"
+				"linux"		"23"
+				"mac"		"23"
+			}
+			
+			"CTeamplayRules::IsTeamplay"
+			{
+				"windows"	"55"
+				"linux"		"56"
+				"mac"		"56"
+			}
+			
+			"CMultiplayRules::IsCoop"
+			{
+				"windows"	"56"
+				"linux"		"57"
+				"mac"		"57"
+			}
+			
+			"CTFGameRules::IsInArenaMode"
+			{
+				"windows"	"177"
+				"linux"		"178"
+				"mac"		"178"
+			}
+			
+			"CTFGameRules::IsInKothMode"
+			{
+				"windows"	"178"
+				"linux"		"179"
+				"mac"		"179"
+			}
+			
+			"CTFGameRules::IsInTraining"
+			{
+				"windows"	"179"
+				"linux"		"180"
+				"mac"		"180"
+			}
+			
+			"CTeamplayRoundBasedRules::IsInItemTestingMode"
+			{
+				"windows"	"180"
+				"linux"		"181"
+				"mac"		"181"
+			}
+			
+			"CTeamplayRoundBasedRules::PlaySpecialCapSounds" // CTeamplayRoundBasedRules::PlaySpecialCapSounds(int iTeam, class CTeamControlPoint near *)
+			{
+				"windows"	"209"
+				"linux"		"210"
+				"mac"		"210"
+			}
+			
+			//"CTeamplayRoundBasedRules::SetWinningTeam"
+			//{
+			//	"windows"	"159"
+			//	"linux"		"160"
+			//	"mac"		"160"
+			//}
+			
+			"CTeamplayRules::ChangePlayerTeam" //(CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib)
+			{
+				"windows"	"113"
+				"linux"		"114"
+				"mac"		"114"
+			}
+			
+			"CBaseEntity::StartTouch"
+			{
+				"windows"	"110"
+				"linux"		"110"
+				"mac"		"110"
+			}
+			
+			"CBaseEntity::AcceptInput" // CBaseEntity::AcceptInput(char const*, CBaseEntity*, CBaseEntity*, variant_t, int)
+			{
+				"windows"	"37"
+				"linux"		"38"
+			}
+			
+			"CBaseEntity::KeyValue" // bool CBaseEntity::KeyValue(char const*, char const*)
+			{
+				"windows"	"32"
+				"linux"		"33"
+			}
+			
+			"CBaseEntity::GetNetworkable" // IServerNetworkable *CBaseEntity::GetNetworkable()
+			{
+				"windows"	"5"
+				"linux"		"5"
+			}
+			
+			"CBaseEntity::GetBaseEntity" // CBaseEntity *CBaseEntity::GetBaseEntity()
+			{
+				"windows"	"6"
+				"linux"		"6"
+			}
+		}
+		"Signatures"
+		{
+			"CreateServerInterface"
+			{
+				"library"		"server"
+				"windows"		"@CreateInterface"
+				"linux"			"@CreateInterface"
+			}
+			
+			"CGlobalEntityList::Clear" // void CGlobalEntityList(void)
+			{
+				// \x00\xE8\xCA\x13\x58
+				"windows"	"\x55\x8B\xEC\x51\x53\x8B\xD9\x56\x57\x8B\x83\x04\x00\x01\x00"
+				"linux"		"\x55\x8B\xEC\x51\x53\x8B\xD9\x56\x57\x8B\x83\x04\x00\x01\x00"
+			}
+			
+			"CGlobalEntityList::CleanupDeleteList" // void CGlobalEntityList::CleanupDeleteList(void)
+			{
+				"windows"	"\x56\xC6\x05\x2A\x2A\x2A\x2A\x01\xE8\x2A\x2A\x2A\x2A\x33\xF6"
+				"linux"		"\x56\xC6\x05\x2A\x2A\x2A\x2A\x01\xE8\x2A\x2A\x2A\x2A\x33\xF6"
+			}
+			
+			// Returns array size before reset
+			"CGlobalEntityList::ResetDeleteList" // int CGlobalEntityList::ResetDeleteList(void)
+			{
+				"windows"	"\xA1\x2A\x2A\x2A\x2A\xC7\x05\x2A\x2A\x2A\x2A\x00\x00\x00\x00\xC3"
+				"linux"		"\xA1\x2A\x2A\x2A\x2A\xC7\x05\x2A\x2A\x2A\x2A\x00\x00\x00\x00\xC3"
+			}
+			
+			"CGlobalEntityList::IsEntityPtr" // bool CGlobalEntityList::IsEntityPtr(void *pMem)
+			{
+				"windows"	"\x55\x8B\xEC\x8B\x55\x08\x85\xD2\x74\x2A\x8B\x81\x04\x00\x01\x00"
+				"linux"		"\x55\x8B\xEC\x8B\x55\x08\x85\xD2\x74\x2A\x8B\x81\x04\x00\x01\x00"
+			}
+			
+			"CServerNetworkProperty::Release" // void CServerNetworkProperty::Release()
+			{
+				"windows"	"\x8B\x49\x08\x85\xC9"
+				"linux"		"\x8B\x49\x08\x85\xC9"
+			}
+			
+			"CServerNetworkProperty::GetEntityHandle" // IHandleEntity *CServerNetworkProperty::GetEntityHandle()
+			{
+				"windows"	"\x0C\x2B\x41\x08\x74\x22\x8B"
+				"linux"		"\x0C\x2B\x41\x08\x74\x22\x8B"
+			}
+			
+			"CBaseEntity::operatorDelete" // CBaseEntity::operator delete(void *pMemory)
+			{
+				"windows"	"\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\xFF\x75\x08\x8B\x01\xFF\x50\x60"
+				"linux"		"\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\xFF\x75\x08\x8B\x01\xFF\x50\x60"
+			}
+			
+			"UTIL_Remove" // void UTIL_Remove(CBaseEntity *oldObj)
+			{
+				// \x4D\x08\x73\x1D
+				"windows"	"\x55\x8B\xEC\x8B\x45\x08\x85\xC0\x74\x2A\x83\xC0\x0C"
+				"linux"		"\x55\x8B\xEC\x8B\x45\x08\x85\xC0\x74\x2A\x83\xC0\x0C"
+			}
+			
+			"CBaseEntity::KeyValueSig"
+			{
+				"windows"	"\x0F\x2E\x05\x2A\x2A\x2A\x2A\x9F\xF6\xC4\x44\x7B\x2A\xC7\x84\x8F\xB8\x07\x00\x00\x00\x00\x80\x3F"
+				"linux"		"\x0F\x2E\x05\x2A\x2A\x2A\x2A\x9F\xF6\xC4\x44\x7B\x2A\xC7\x84\x8F\xB8\x07\x00\x00\x00\x00\x80\x3F"
+			}
+			
+			"CTeamControlPoint::InternalSetOwner" // void CTeamControlPoint::InternalSetOwner(int iCapTeam, bool bMakeSound, int iNumCappers, int *pCappingPlayers)
+			{
+				"windows"	"\x55\x8B\xEC\x83\xEC\x28\x53\x56\x8B\xF1\x57\x89\x75\xF8"
+				"linux"		"\x55\x8B\xEC\x83\xEC\x28\x53\x56\x8B\xF1\x57\x89\x75\xF8"
+			}
+			
+			"CTeamControlPoint::SetOwner" // void CTeamControlPoint::SetOwner(int iCapTeam, bool bMakeSound, int iNumCappers, int *pCappingPlayers)
+			{
+				"windows"	"\x55\x8B\xEC\x57\x8B\xF9\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x80\x74\x02\x00\x00"
+				"linux"		"\x55\x8B\xEC\x57\x8B\xF9\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x80\x74\x02\x00\x00"
+			}
+			
+			"CTeamControlPoint::ForceOwner" // void CTeamControlPoint::ForceOwner(int iTeam)
+			{
+				"windows"	"\x55\x8B\xEC\x56\x6A\x00\x6A\x00\x6A\x00\xFF\x75\x08"
+				"linux"		"\x55\x8B\xEC\x56\x6A\x00\x6A\x00\x6A\x00\xFF\x75\x08"
+			}
+			
+			"CTriggerAreaCapture::EndCapture" // void CTriggerAreaCapture::EndCapture( int team )
+			{
+				"windows"	"\x55\x8B\xEC\x83\xEC\x2C\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x53"
+				"linux"		"\x55\x8B\xEC\x83\xEC\x2C\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x53"
+			}
+			
+			"CTeamplayRoundBasedRules::SetWinningTeam"
+			{
+				"windows"	"\x55\x8B\xEC\x83\xEC\x08\x56\x8B\xF1\xE8\x2A\x2A\x2A\x2A\x84\xC0\x0F\x85\x2A\x2A\x2A\x2A"
+				"linux"		"\x55\x8B\xEC\x83\xEC\x08\x56\x8B\xF1\xE8\x2A\x2A\x2A\x2A\x84\xC0\x0F\x85\x2A\x2A\x2A\x2A"
+			}
+			
+			"EntityFactoryDictionary" // EntityFactoryDictionary()
+			{
+				"windows"	"\xA1\x2A\x2A\x2A\x2A\xA8\x01\x75\x2A\x83\xC8\x01\xB9\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x68\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x83\xC4\x04\xB8\x2A\x2A\x2A\x2A"
+				"linux"		"\xA1\x2A\x2A\x2A\x2A\xA8\x01\x75\x2A\x83\xC8\x01\xB9\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x68\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x83\xC4\x04\xB8\x2A\x2A\x2A\x2A"
+			}
+			
+			"CEntityFactoryDictionary::FindFactory" // IEntityFactory *CEntityFactoryDictionary::FindFactory(const char *pszClassname)
+			{
+				"windows"	"\x55\x8B\xEC\x8B\x45\x08\x83\xEC\x08\x56\x8B\xF1\x85\xC0\x74\x2A\x89\x45\xF8\x8D\x4E\x04\x8D\x45\xF8\x50\xE8\x2A\x2A\x2A\x2A\x0F\xB7\xC0\xB9\xFF\xFF\x00\x00"
+				"linux"		"\x55\x8B\xEC\x8B\x45\x08\x83\xEC\x08\x56\x8B\xF1\x85\xC0\x74\x2A\x89\x45\xF8\x8D\x4E\x04\x8D\x45\xF8\x50\xE8\x2A\x2A\x2A\x2A\x0F\xB7\xC0\xB9\xFF\xFF\x00\x00"
+			}
+			
+			"CEntityFactoryDictionary::InstallFactory" // void CEntityFactoryDictionary::InstallFactory(IEntityFactory *, const char *pClassName)
+			{
+				"windows"	"\x55\x8B\xEC\x8D\x45\x08\x83\xC1\x04"
+				"linux"		"\x55\x8B\xEC\x8D\x45\x08\x83\xC1\x04"
+			}
+			
+			"WeaponIDToAlias" // const char *WeaponIDToAlias(int m_Item)
+			{
+				// \x55\x8B\xEC\x8B\x45\x08\x83\xF8\x38
+				"windows"	"\xFF\xF3\x0F\x10\x45\x90\xDD\xD8\x0F\x54\x05\x2A\x2A\x2A\x2A\x0F\x2F\x05\x2A\x2A\x2A\x2A\x76\x2A\xC6\x45\xCB\x01\x8B\x07"
+				"linux"		"\x55\x8B\xEC\x8B\x45\x08\x83\xF8\x38"
+			}
+			
+			"V_strncpy"
+			{
+				"windows"	"\x55\x8B\xEC\x56\x8B\x75\x10\x57\x8B\x7D\x08"
+				"linux"		"@_Z9V_strncpyPcPKci"
+			}
+		}
+		
+		"Functions"
+		{
+			"CServerGameDLL::LevelInit"
+			{
+				"offset"	"CServerGameDLL::LevelInit"
+				"hooktype"	"raw"
+				"return"	"bool"
+				"this"		"ignore"
+				"arguments"
+				{
+					"pMapName"
+					{
+						"type"	"charptr"
+					}
+					"pMapEntities"
+					{
+						"type"	"charptr"
+					}
+					"pOldLevel"
+					{
+						"type"	"charptr"
+					}
+					"pLandmarkName"
+					{
+						"type"	"charptr"
+					}
+					"loadGame"
+					{
+						"type"	"bool"
+					}
+					"background"
+					{
+						"type"	"bool"
+					}
+				}
+			}
+			
+			"CServerGameDLL::LevelShutdown"
+			{
+				"offset"	"CServerGameDLL::LevelShutdown"
+				"hooktype"	"raw"
+				"return"	"bool"
+				"this"		"ignore"
+			}
+			
+			"CGlobalEntityList::Clear"
+			{
+				"signature"	"CGlobalEntityList::Clear"
+				"hooktype"	"raw"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"address"
+			}
+			
+			"CGlobalEntityList::CleanupDeleteList"
+			{
+				"signature"	"CGlobalEntityList::CleanupDeleteList"
+				"hooktype"	"raw"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"address"
+			}
+			
+			"CServerNetworkProperty::Release"
+			{
+				"signature"	"CServerNetworkProperty::Release"
+				"hooktype"	"raw"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				// NOTE: this address is the same as CBaseEntity::GetNetworkable() + 12
+				"this"		"address"
+			}
+			
+			"CBaseEntity::operatorDelete" // CBaseEntity::operator delete(void *pMemory)
+			{
+				"signature" "CBaseEntity::operatorDelete"
+				"hooktype"	"raw"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				// parameter of CBaseEntity converted to void *pMemory
+				"this"		"address"
+			}
+			
+			"CBaseEntity::AcceptInput"
+			{
+				"offset"	"CBaseEntity::AcceptInput"
+				"hooktype"	"entity"
+				"return"	"bool"
+				"this"		"entity"
+				"arguments"
+				{
+					"szInputName"
+					{
+						"type"	"charptr"
+					}
+					"pActivator"
+					{
+						"type"	"cbaseentity"
+					}
+					"pCaller"
+					{
+						"type"	"cbaseentity"
+					}
+					"Value"
+					{
+						"type"	"object"
+						"size"	"20"
+						"flags"	"byval odtor octor oassignop"
+					}
+					"outputID"
+					{
+						"type"	"int"
+					}
+				}
+			}
+			
+			"CBaseEntity::KeyValue"
+			{
+				"offset"	"CBaseEntity::KeyValue"
+				"callconv"	"thiscall"
+				"hooktype"	"entity"
+				"return"	"bool"
+				"this"		"entity"
+				"arguments"
+				{
+					"szKey"
+					{
+						"type"	"charptr"
+					}
+					"szValue"
+					{
+						"type"	"charptr"
+					}
+				}
+			}
+			
+			"CTeamControlPoint::InternalSetOwner"
+			{
+				"signature"	"CTeamControlPoint::InternalSetOwner"
+				"callconv"	"thiscall"
+				//"hooktype"	"entity"
+				"return"	"void"
+				"this"		"entity"
+				"arguments"
+				{
+					"iCapTeam"
+					{
+						"type"	"int"
+					}
+					"bMakeSound"
+					{
+						"type"	"bool"
+					}
+					"iNumCappers"
+					{
+						"type"	"int"
+					}
+					"pCappingPlayers"
+					{
+						"type"	"objectptr"
+						"flags"	"byref"
+					}
+				}
+			}
+			
+			"CTeamControlPoint::SetOwner"
+			{
+				"signature"	"CTeamControlPoint::SetOwner"
+				"callconv"	"thiscall"
+				//"hooktype"	"entity"
+				"return"	"void"
+				"this"		"entity"
+				"arguments"
+				{
+					"iCapTeam"
+					{
+						"type"	"int"
+					}
+					"bMakeSound"
+					{
+						"type"	"bool"
+					}
+					"iNumCappers"
+					{
+						"type"	"int"
+					}
+					"pCappingPlayers"
+					{
+						"type"	"objectptr"
+						"flags"	"byref"
+					}
+				}
+			}
+			
+			"CTeamControlPoint::ForceOwner"
+			{
+				"signature"	"CTeamControlPoint::ForceOwner"
+				"callconv"	"thiscall"
+				//"hooktype"	"entity"
+				"return"	"void"
+				"this"		"entity"
+				"arguments"
+				{
+					"iTeam"
+					{
+						"type"	"int"
+					}
+				}
+			}
+			
+			"CTriggerAreaCapture::EndCapture"
+			{
+				"signature"	"CTriggerAreaCapture::EndCapture"
+				//"callconv"	"thiscall"
+				"hooktype"	"entity"
+				"return"	"void"
+				"this"		"entity"
+				"arguments"
+				{
+					"iCapTeam"
+					{
+						"type"	"int"
+					}
+				}
+			}
+			
+			"CTeamplayRules::ChangePlayerTeam"
+			{
+				"offset"	"CTeamplayRules::ChangePlayerTeam"
+				"hooktype"	"gamerules"
+				"return"	"bool"
+				"this"		"ignore"
+				//"arguments"
+				//{
+				//	"pPlayer"
+				//	{
+				//		"type"	"cbaseentity"
+				//	}
+				//	"szTeamName"
+				//	{
+				//		"type"	"charptr"
+				//	}
+				//	"bKill"
+				//	{
+				//		"type"	"bool"
+				//	}
+				//	"bGib"
+				//	{
+				//		"type"	"bool"
+				//	}
+				//}
+			}
+			
+			"CTeamplayRoundBasedRules::PlaySpecialCapSounds"
+			{
+				"offset"	"CTeamplayRoundBasedRules::PlaySpecialCapSounds"
+				"hooktype"	"gamerules"
+				"return"	"bool"
+				"this"		"ignore"
+			}
+			
+			"CTeamplayRoundBasedRules::SetWinningTeam"
+			{
+				"signature"	"CTeamplayRoundBasedRules::SetWinningTeam"
+				//"offset"	"CTeamplayRoundBasedRules::SetWinningTeam"
+				"hooktype"	"gamerules"
+				"return"	"bool"
+				"this"		"ignore"
+				"arguments"
+				{
+					"team"
+					{
+						"type"	"int"
+					}
+					"iWinReason"
+					{
+						"type"	"int"
+					}
+					"bForceMapReset"
+					{
+						"type"	"bool"
+					}
+					"bSwitchTeams"
+					{
+						"type"	"bool"
+					}
+					"bDontAddScore"
+					{
+						"type"	"bool"
+					}
+					"bFinal"
+					{
+						"type"	"bool"
+					}
+				}
+			}
+		}
+	}
+}
