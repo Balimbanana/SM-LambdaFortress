@@ -845,6 +845,15 @@ public Action OnJeepTakeDamage(int victim, int& attacker, int& inflictor, float&
 			int hPlayer = GetEntPropEnt(victim, Prop_Data, "m_hPlayer");
 			if ((IsValidEntity(hPlayer)) && (hPlayer > 0) && (hPlayer <= MaxClients))
 			{
+				if ((attacker > MaxClients) && (HasEntProp(attacker, Prop_Data, "m_hOwnerEntity")))
+				{
+					int hOwner = GetEntPropEnt(attacker, Prop_Data, "m_hOwnerEntity");
+					if ((IsValidEntity(hOwner)) && (hOwner > 0) && (hOwner < MaxClients+1))
+					{
+						attacker = hOwner;
+					}
+				}
+				
 				if ((HasEntProp(attacker, Prop_Data, "m_iTeamNum")) && (HasEntProp(hPlayer, Prop_Data, "m_iTeamNum")))
 				{
 					int iPlayerTeam = GetEntProp(hPlayer, Prop_Data, "m_iTeamNum");
@@ -968,7 +977,7 @@ public Action resetdev(Handle timer)
 			if (IsClientInGame(i))
 			{
 				QueryClientConVar(i, "sv_cheats", clcheat, 0);
-				QueryClientConVar(i, "hud_classautokill", clclassauto, 0);
+				//QueryClientConVar(i, "hud_classautokill", clclassauto, 0);
 				if (HasEntProp(i, Prop_Send, "m_bIsPlayerADev"))
 				{
 					if (GetEntProp(i, Prop_Send, "m_bIsPlayerADev"))
@@ -1007,6 +1016,7 @@ public Action everyspawnpost(Handle timer, int client)
 	{
 		if (HasEntProp(client, Prop_Send, "m_bIsPlayerADev")) SetEntProp(client, Prop_Send, "m_bIsPlayerADev", 0);
 		if (HasEntProp(client, Prop_Send, "m_bIsPlayerNicknine")) SetEntProp(client, Prop_Send, "m_bIsPlayerNicknine", 0);
+		if (HasEntProp(client, Prop_Data, "m_usSolidFlags")) SetEntProp(client, Prop_Data, "m_usSolidFlags", 0);
 	}
 	else CreateTimer(0.1, everyspawnpost, client, TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -1034,6 +1044,20 @@ public Action killtaunt(int client, int args)
 				return Plugin_Handled;
 			}
 		}
+		
+		static char szClassname[24];
+		if (HasEntProp(client, Prop_Data, "m_hViewEntity"))
+		{
+			int hViewEntity = GetEntPropEnt(client, Prop_Data, "m_hViewEntity");
+			if (IsValidEntity(hViewEntity) && hViewEntity != client)
+			{
+				GetEntityClassname(hViewEntity, szClassname, sizeof(szClassname));
+				if (StrEqual(szClassname, "point_viewcontrol", false))
+				{
+					return Plugin_Handled;
+				}
+			}
+		}
 	}
 	return Plugin_Continue;
 }
@@ -1056,6 +1080,20 @@ public Action blocktaunt(int client, int args)
 						{
 							return Plugin_Handled;
 						}
+					}
+				}
+			}
+			
+			static char szClassname[24];
+			if (HasEntProp(client, Prop_Data, "m_hViewEntity"))
+			{
+				int hViewEntity = GetEntPropEnt(client, Prop_Data, "m_hViewEntity");
+				if (IsValidEntity(hViewEntity) && hViewEntity != client)
+				{
+					GetEntityClassname(hViewEntity, szClassname, sizeof(szClassname));
+					if (StrEqual(szClassname, "point_viewcontrol", false))
+					{
+						return Plugin_Handled;
 					}
 				}
 			}

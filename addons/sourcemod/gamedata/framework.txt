@@ -26,6 +26,34 @@
 				"linux"		"7"
 			}
 			
+			"IFileSystem::AddSearchPath"
+			{
+				"windows"	"7"
+				"linux"		"7"
+			}
+			
+			"IFileSystem::RemoveSearchPath"
+			{
+				"windows"	"8"
+				"linux"		"8"
+			}
+			
+			// For rebuilding entire mount point
+			// This can be done safely over a couple frames on changelevel, re-add everything required in specific order
+			// Most likely not needed for LFE server-side though
+			"IFileSystem::RemoveAllSearchPaths"
+			{
+				"windows"	"4"
+				"linux"		"4"
+			}
+			
+			// TODO
+			"IFileSystem::RelativePathToFullPath" // Or RelativePathToFullPath_safe
+			{
+				"windows"	"1"
+				"linux"		"1"
+			}
+			
 			"CTFPlayer::Spawn"
 			{
 				"windows"	"22"
@@ -126,6 +154,24 @@
 				"windows"	"6"
 				"linux"		"6"
 			}
+			
+			"CBaseGrenade::Explode" // CBaseGrenade::Explode(CGameTrace *, int)
+			{
+				"windows"	"236"
+				"linux"		"237"
+			}
+			
+			"CGrenadePathfollower::Detonate"
+			{
+				"windows"	"237"
+				"linux"		"238"
+			}
+			
+			"CBaseEntity::VPhysicsCollision"
+			{
+				"windows"	"175"
+				"linux"		"176"
+			}
 		}
 		"Signatures"
 		{
@@ -134,6 +180,12 @@
 				"library"		"server"
 				"windows"		"@CreateInterface"
 				"linux"			"@CreateInterface"
+			}
+			
+			"PrecacheFileWeaponInfoDatabase"
+			{
+				"windows"		"\x55\x8B\xEC\x81\xEC\x0C\x02\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x66\x83\x3D\x2A\x2A\x2A\x2A\x00"
+				"linux"			"\x55\x8B\xEC\x81\xEC\x0C\x02\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x66\x83\x3D\x2A\x2A\x2A\x2A\x00"
 			}
 			
 			"CGlobalEntityList::Clear" // void CGlobalEntityList(void)
@@ -178,6 +230,19 @@
 			{
 				"windows"	"\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\xFF\x75\x08\x8B\x01\xFF\x50\x60"
 				"linux"		"\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\xFF\x75\x08\x8B\x01\xFF\x50\x60"
+			}
+			
+			"CBaseEntity::ApplyLocalAngularVelocityImpulse"
+			{
+				"windows"	"\x55\x8B\xEC\xF3\x0F\x10\x05\x2A\x2A\x2A\x2A\x83\xEC\x0C\x56\x8B\x75\x08"
+				//"windowsnot"	"\x0F\x58\x4E\x18"
+				"linux"		"\x55\x8B\xEC\xF3\x0F\x10\x05\x2A\x2A\x2A\x2A\x83\xEC\x0C\x56\x8B\x75\x08"
+			}
+			
+			"CGrenadePathfollower::DetonateSig" // void CGrenadePathfollower::Detonate(void)
+			{
+				"windows"	"\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC\x58\x01\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x56\x8B\xF1\xB9\x2A\x2A\x2A\x2A"
+				"linux"		"\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC\x58\x01\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x56\x8B\xF1\xB9\x2A\x2A\x2A\x2A"
 			}
 			
 			"UTIL_Remove" // void UTIL_Remove(CBaseEntity *oldObj)
@@ -300,6 +365,26 @@
 				"this"		"ignore"
 			}
 			
+			"PrecacheFileWeaponInfoDatabase"
+			{
+				"signature"	"PrecacheFileWeaponInfoDatabase"
+				"hooktype"	"raw"
+				"return"	"void"
+				"this"		"ignore"
+				"arguments"
+				{
+					"filesystem"
+					{
+						"type"	"int"
+					}
+					
+					"pICEKey"
+					{
+						"type"	"charptr"
+					}
+				}
+			}
+			
 			"CGlobalEntityList::Clear"
 			{
 				"signature"	"CGlobalEntityList::Clear"
@@ -336,6 +421,54 @@
 				"return"	"bool"
 				// parameter of CBaseEntity converted to void *pMemory
 				"this"		"address"
+			}
+			
+			"CBaseEntity::ApplyLocalAngularVelocityImpulse" // void CBaseEntity::ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImpulse )
+			{
+				"signature" "CBaseEntity::ApplyLocalAngularVelocityImpulse"
+				"hooktype"	"raw"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"entity"
+				"arguments"
+				{
+					"angImpulse"
+					{
+						"type"	"vectorptr"
+					}
+				}
+			}
+			
+			"CBaseGrenade::Explode"
+			{
+				"offset"	"CBaseGrenade::Explode"
+				"hooktype"	"entity"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"entity"
+				"arguments"
+				{
+					"CGameTrace"
+					{
+						"type"	"object"
+						"size"	"20"
+						"flags"	"byval odtor octor oassignop"
+					}
+					
+					"damgetype"
+					{
+						"type"	"int"
+					}
+				}
+			}
+			
+			"CGrenadePathfollower::Detonate"
+			{
+				"offset"	"CGrenadePathfollower::Detonate"
+				"hooktype"	"entity"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"entity"
 			}
 			
 			"CBaseEntity::AcceptInput"
@@ -387,6 +520,21 @@
 					"szValue"
 					{
 						"type"	"charptr"
+					}
+				}
+			}
+			
+			"CBaseCombatCharacter::IRelationType"
+			{
+				"offset"	"CBaseCombatCharacter::IRelationType"
+				"hooktype"	"entity"
+				"return"	"int"
+				"this"		"entity"
+				"arguments"
+				{
+					"pTarget"
+					{
+						"type"	"cbaseentity"
 					}
 				}
 			}
