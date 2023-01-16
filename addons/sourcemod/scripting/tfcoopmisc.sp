@@ -283,7 +283,8 @@ public Action Command_CallVoteBlock(int client, int args)
 			{
 				char szArg2[64];
 				GetCmdArg(2, szArg2, sizeof(szArg2));
-				if (((strlen(szArg2) > 1) || (args > 2)) && (!StrEqual(szArg2, "666", false))) return Plugin_Handled;
+				if ((args == 2) && (StrEqual(szArg2, "666", false))) return Plugin_Continue;
+				if ((strlen(szArg2) > 1) || (args > 2)) return Plugin_Handled;
 			}
 		}
 	}
