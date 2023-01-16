@@ -7,7 +7,7 @@
 #define REQUIRE_PLUGIN
 #define REQUIRE_EXTENSIONS
 
-#define PLUGIN_VERSION "1.10"
+#define PLUGIN_VERSION "1.11"
 #define UPDATE_URL "https://raw.githubusercontent.com/Balimbanana/SM-LambdaFortress/master/addons/sourcemod/lfmiscfixesupdater.txt"
 
 #pragma semicolon 1;
@@ -283,7 +283,7 @@ public Action Command_CallVoteBlock(int client, int args)
 			{
 				char szArg2[64];
 				GetCmdArg(2, szArg2, sizeof(szArg2));
-				if ((strlen(szArg2) > 1) || (args > 2)) return Plugin_Handled;
+				if (((strlen(szArg2) > 1) || (args > 2)) && (!StrEqual(szArg2, "666", false))) return Plugin_Handled;
 			}
 		}
 	}
