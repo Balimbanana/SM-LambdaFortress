@@ -1,5 +1,8 @@
 # SM-LambdaFortress
-SourceMod offsets/signatures for Lambda Fortress.
+SourceMod offsets/signatures for Lambda Fortress Extended.
+
+# Don't use LFE
+# this repo will remain archived until LFE is finally gone, then this will be deleted
 
 Tested and fully functional on:
 
